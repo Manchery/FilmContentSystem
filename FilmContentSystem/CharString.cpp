@@ -31,13 +31,18 @@ CharString::CharString(int len)
 	_str = len == 0 ? nullptr : new wchar_t[len] {0};
 }
 
+CharString::CharString(const CharString & wstr):CharString(wstr._str)
+{
+	
+}
+
 
 CharString::~CharString()
 {
 	delete _str;
 }
 
-wchar_t CharString::operator[](int x)
+wchar_t CharString::operator[](int x) const
 {
 	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
 	return _str[x];
@@ -100,4 +105,13 @@ CharString concat(const CharString & a, const CharString & b)
 CharString operator+(const CharString & a, const CharString & b)
 {
 	return concat(a, b);
+}
+
+bool operator==(const CharString & a, const CharString & b)
+{
+	if (a.length() != b.length()) return false;
+	for (int i = 0; i < a.length(); i++)
+		if (a[i] != b[i]) 
+			return false;
+	return true;
 }
