@@ -15,6 +15,8 @@ private:
 	void destructList(node *cur);
 public:
 	CharStringLink();
+	CharStringLink(const CharStringLink &b);
+	CharStringLink& operator = (const CharStringLink &b);
 	~CharStringLink();
 	void add_back(const CharString &s);
 	void add_front(const CharString &s);
@@ -22,7 +24,5 @@ public:
 	int search(const CharString &s);
 	void remove(node *x);
 	void remove(const CharString &s);
-
-	CharStringLink operator = (const CharStringLink &) = delete;
 };
 
