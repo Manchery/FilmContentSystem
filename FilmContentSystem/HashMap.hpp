@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 using hash_t = unsigned long long;
 const unsigned LEN_HASH_SIZES = 27;

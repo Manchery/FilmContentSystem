@@ -76,7 +76,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -115,7 +119,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CharString.h" />
+    <ClInclude Include="FilmContentSystemApplication.h" />
+    <ClInclude Include="HashMap.hpp" />
     <ClInclude Include="Stack.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CharString.cpp" />
+    <ClCompile Include="FilmContentSystemApplication.cpp" />
+    <ClCompile Include="FilmContentSystemMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

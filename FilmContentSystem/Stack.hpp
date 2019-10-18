@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <stdexcept>
 
 template<typename value_t>
 class Stack
@@ -38,12 +39,12 @@ public:
 	}
 	void pop() {
 		if (empty())
-			throw std::out_of_range(); // TODO
+			throw std::out_of_range(""); // TODO
 		--_top;
 	}
 	void top() const {
 		if (empty())
-			throw std::out_of_range(); // TODO 
+			throw std::out_of_range(""); // TODO 
 		return _stack[_top];
 	}
 	bool empty() const {
