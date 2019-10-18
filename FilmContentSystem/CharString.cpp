@@ -1,6 +1,7 @@
 #include "CharString.h"
 #include <stdexcept>
 #include <cstring>
+#include <string>
 
 
 CharString::CharString()
@@ -31,9 +32,27 @@ CharString::CharString(int len)
 	_str = len == 0 ? nullptr : new wchar_t[len] {0};
 }
 
-CharString::CharString(const CharString & wstr):CharString(wstr._str)
+CharString::CharString(const CharString & wstr)
 {
-	
+	_len = wstr._len;
+	if (_len == 0)
+		_str = nullptr;
+	else {
+		_str = new wchar_t[_len];
+		memcpy(_str, wstr._str, sizeof(wchar_t)*_len);
+	}
+}
+
+CharString::CharString(const std::wstring & wstr)
+{
+	_len = wstr.length();
+	if (_len == 0)
+		_str = nullptr;
+	else {
+		_str = new wchar_t[_len];
+		for (int i = 0; i < _len; i++)
+			_str[i] = wstr[i];
+	}
 }
 
 
@@ -43,6 +62,12 @@ CharString::~CharString()
 }
 
 wchar_t CharString::operator[](int x) const
+{
+	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
+	return _str[x];
+}
+
+wchar_t & CharString::operator[](int x)
 {
 	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
 	return _str[x];
@@ -92,6 +117,20 @@ CharString & CharString::operator=(const CharString & b)
 	return assign(b);
 }
 
+std::wistream & operator>>(std::wistream & is, CharString & str)
+{
+	std::wstring wstr;
+	is >> wstr;
+	str._len = wstr.length(); for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
+	return is;
+}
+
+std::wostream & operator<<(std::wostream & os, CharString & str)
+{
+	for (int i = 0; i < str._len; i++) os << str._str[i];
+	return os;
+}
+
 CharString concat(const CharString & a, const CharString & b)
 {
 	CharString result(a.length()+b.length());
@@ -114,4 +153,13 @@ bool operator==(const CharString & a, const CharString & b)
 		if (a[i] != b[i]) 
 			return false;
 	return true;
+}
+
+hash_t charStringHash(const CharString & str) {
+	static hash_t seed = 50021;
+	hash_t h = 0;
+	for (int i = 0; i < str.length(); i++) {
+		h = h * seed + (hash_t)str[i];
+	}
+	return h;
 }

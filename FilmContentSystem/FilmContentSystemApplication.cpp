@@ -13,6 +13,7 @@ FilmContentSystemApplication::~FilmContentSystemApplication()
 
 void FilmContentSystemApplication::initDictionary(const char * filename)
 {
+	seg.loadDict(filename);
 }
 
 FilmInfo FilmContentSystemApplication::extractInfo(const char * filename)

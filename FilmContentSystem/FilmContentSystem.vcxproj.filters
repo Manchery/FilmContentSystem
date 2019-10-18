@@ -13,18 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\数据结构">
+      <UniqueIdentifier>{9657e4a1-135e-4221-afb1-6b3a1971d632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\数据结构">
+      <UniqueIdentifier>{4d871625-edf2-4f83-b336-035ced559b24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Stack.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="HashMap.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="FilmContentSystemApplication.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FilmInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="CharString.h">
+      <Filter>头文件\数据结构</Filter>
+    </ClInclude>
+    <ClInclude Include="CharStringLink.h">
+      <Filter>头文件\数据结构</Filter>
+    </ClInclude>
+    <ClInclude Include="HashMap.hpp">
+      <Filter>头文件\数据结构</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack.hpp">
+      <Filter>头文件\数据结构</Filter>
+    </ClInclude>
+    <ClInclude Include="WordSegmentor.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,7 +50,16 @@
     <ClCompile Include="FilmContentSystemApplication.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="FilmInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="CharString.cpp">
+      <Filter>源文件\数据结构</Filter>
+    </ClCompile>
+    <ClCompile Include="CharStringLink.cpp">
+      <Filter>源文件\数据结构</Filter>
+    </ClCompile>
+    <ClCompile Include="WordSegmentor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

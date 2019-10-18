@@ -1,19 +1,19 @@
-#include <cstdio>
-#include <cstdlib>
-#include <algorithm>
-#include <iostream>
-#include <cstring>
-#include <string>
-#include <fstream>
+#include "FilmContentSystemApplication.h"
 using namespace std;
+
+void _main() {
+	FilmContentSystemApplication app;
+	app.initDictionary("C:\\Users\\Manchery\\Desktop\\jieba\\dict2.txt");
+}
 
 int main() {
 	locale::global(locale("chs"));
-	wstring wstr;
-	freopen("test.txt","r",stdin);
-	wcin >> wstr;
-	cout << wstr.length() << endl;
-	wcout << wstr << endl;
-	//system("pause");
+	//std::ios::sync_with_stdio(false);
+	//std::cin.tie(0);
+
+	_main();
+	_CrtDumpMemoryLeaks();
+	putchar('*');
+	while (true);
 	return 0;
 }

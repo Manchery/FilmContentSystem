@@ -1,9 +1,12 @@
 #pragma once
 
 #include "FilmInfo.h"
+#include "WordSegmentor.h"
 
 class FilmContentSystemApplication
 {
+private:
+	WordSegmentor seg;
 public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();
