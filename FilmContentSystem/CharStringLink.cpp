@@ -4,26 +4,6 @@ CharStringLink::CharStringLink() {
 	head = tail = nullptr;
 }
 
-CharStringLink::CharStringLink(const CharStringLink & b)
-{
-	head = tail = nullptr;
-	for (node *p = b.head; p; p = p->next) {
-		node *newNode = new node{ p->str, nullptr, nullptr };
-		newNode->next = head; head = newNode;
-	}
-}
-
-CharStringLink & CharStringLink::operator=(const CharStringLink & b)
-{
-	destructList(head);
-	head = tail = nullptr;
-	for (node *p = b.head; p; p = p->next) {
-		node *newNode = new node{ p->str, nullptr, nullptr };
-		newNode->next = head; head = newNode;
-	}
-	return *this;
-}
-
 CharStringLink::~CharStringLink() {
 	destructList(head);
 }
