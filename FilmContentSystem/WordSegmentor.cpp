@@ -4,6 +4,7 @@
 #include <fstream>
 #include <ctime>
 #include <algorithm>
+using std::max;
 
 
 
@@ -14,11 +15,71 @@ WordSegmentor::WordSegmentor()
 
 WordSegmentor::~WordSegmentor()
 {
+	delete[] logProb; delete[] jump;
 }
 
 void WordSegmentor::loadDict(const char * dictFile)
 {
 	loadDict_v1(dictFile);
+}
+
+CharStringLink WordSegmentor::cut(const CharString &passage)
+{
+	CharStringLink res;
+
+	CharString sentence;
+	for (int i = 0; i < passage.length(); i++) {
+		if (isChinese(passage[i])) {
+			sentence += passage[i];
+		}
+		else {
+			res.concat(cut_DAG(sentence));
+			sentence.clear();
+			res.add_back(passage[i]);
+		}
+	}
+	if (!sentence.empty()) {
+		res.concat(cut_DAG(sentence));
+		sentence.clear();
+	}
+	return res;
+}
+
+CharStringLink WordSegmentor::cut_DAG(const CharString &sentense)
+{
+	int len = sentense.length();
+	delete[] logProb; logProb = new double[len+1]; 
+	delete[] jump; jump = new int[len+1];
+	logProb[len] = 0;
+	double logTotalFreq = log(totalFreq);
+	for (int i = len - 1; ~i; i--) {
+		logProb[i] = -1e10; jump[i] = -1;
+		bool hasWord = false;
+		for (int j = 1; j <= maxWordLen && i + j - 1 < len; j++) {
+			CharString word = sentense.substring(i, i + j); // TODO: optimize speed
+			if (dict.find(word)) {
+				hasWord = true;
+				int freq = dict[word];
+				double tmp = logProb[i + j] + log(freq) - logTotalFreq;
+				if (tmp >= logProb[i]) {
+					logProb[i] = tmp;
+					jump[i] = i + j;
+				}
+			}
+		}
+		if (!hasWord) {
+			logProb[i] = logProb[i + 1] /* + log(1) */ - logTotalFreq;
+			jump[i] = i + 1;
+		}
+	}
+	CharStringLink res;
+	if (jump[0] == -1) return res;
+	int p = 0; 
+	while (p != len) {
+		res.add(sentense.substring(p, jump[p]));
+		p = jump[p];
+	}
+	return res;
 }
 
 void WordSegmentor::loadDict_v1(const char * dictFile)
@@ -93,4 +154,24 @@ void WordSegmentor::loadDict_v3(const char * dictFile)
 			std::cout << numWords << std::endl;*/
 	}
 	wfin.close();
+}
+
+bool isLower(wchar_t w) {
+	return 'a' <= w && w <= 'z';
+}
+
+bool isUpper(wchar_t w) {
+	return 'A' <= w && w <= 'Z';
+}
+
+bool isDigit(wchar_t w) {
+	return '0' <= w && w <= '9';
+}
+
+bool isHan(wchar_t w) {
+	return L'Ò»' <= w && w <= L'ý›';
+}
+
+bool isChinese(wchar_t w) {
+	return isHan(w) || isLower(w) || isUpper(w) || isDigit(w);
 }

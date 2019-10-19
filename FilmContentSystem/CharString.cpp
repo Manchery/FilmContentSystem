@@ -6,18 +6,18 @@
 
 CharString::CharString()
 {
-	_len = 0; _str = nullptr;
+	_len = _capacity = 0; _str = nullptr;
 }
 
 CharString::CharString(wchar_t ch)
 {
-	_len = 1;
+	_len = _capacity = 1;
 	_str = new wchar_t[1]{ ch };
 }
 
 CharString::CharString(const wchar_t * wstr)
 {
-	_len = wcslen(wstr);
+	_len = _capacity = wcslen(wstr);
 	if (_len == 0)
 		_str = nullptr;
 	else {
@@ -28,13 +28,13 @@ CharString::CharString(const wchar_t * wstr)
 
 CharString::CharString(int len)
 {
-	_len = len; 
+	_len = _capacity = len; 
 	_str = len == 0 ? nullptr : new wchar_t[len] {0};
 }
 
 CharString::CharString(const CharString & wstr)
 {
-	_len = wstr._len;
+	_len = _capacity = wstr._len;
 	if (_len == 0)
 		_str = nullptr;
 	else {
@@ -45,7 +45,7 @@ CharString::CharString(const CharString & wstr)
 
 CharString::CharString(const std::wstring & wstr)
 {
-	_len = wstr.length();
+	_len = _capacity = wstr.length();
 	if (_len == 0)
 		_str = nullptr;
 	else {
@@ -60,6 +60,14 @@ CharString::~CharString()
 	delete[] _str;
 }
 
+void CharString::reserve(int cap)
+{
+	if (cap <= _capacity) return;
+	wchar_t *newStr = new wchar_t[cap];
+	memcpy(newStr, _str, sizeof(wchar_t)*_len);
+	delete[] _str; _str = newStr; _capacity = cap;
+}
+
 wchar_t CharString::operator[](int x) const
 {
 	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
@@ -72,7 +80,7 @@ wchar_t & CharString::operator[](int x)
 	return _str[x];
 }
 
-CharString CharString::substring(int l, int r) {
+CharString CharString::substring(int l, int r) const {
 	if (l < 0 || r > _len)
 		throw std::out_of_range(""); // TODO
 	if (l >= r)
@@ -82,7 +90,7 @@ CharString CharString::substring(int l, int r) {
 	return result;
 }
 
-int CharString::indexOf(CharString & b)
+int CharString::indexOf(CharString & b) const
 {
 	int blen = b.length();
 	int *next = new int[blen];
@@ -108,9 +116,14 @@ int CharString::indexOf(CharString & b)
 
 CharString& CharString::assign(const CharString & b)
 {
-	_len = b.length();
-	delete[] _str; _str = new wchar_t[_len];
-	memcpy(_str, b._str, sizeof(wchar_t)*_len);
+	if (b._len > _capacity) {
+		_len = _capacity = b.length();
+		delete[] _str; _str = new wchar_t[_len];
+		memcpy(_str, b._str, sizeof(wchar_t)*_len);
+	} else {
+		_len = b.length();
+		memcpy(_str, b._str, sizeof(wchar_t)*_len);
+	}		
 	return *this;
 }
 
@@ -119,13 +132,43 @@ CharString & CharString::operator=(const CharString & b)
 	return assign(b);
 }
 
+CharString & CharString::operator+=(const CharString & b)
+{
+	if (_len + b._len > _capacity) {
+		int newCap = _capacity == 0 ? 1 : _capacity;
+		while (newCap < _len + b._len) newCap <<= 1;
+		reserve(newCap);
+	}
+	memcpy(_str + _len, b._str, sizeof(wchar_t)*b._len);
+	_len += b._len;
+	return *this;
+}
+
+CharString & CharString::operator+=(wchar_t b)
+{
+	if (_len + 1 > _capacity) {
+		int newCap = _capacity == 0 ? 1 : _capacity;
+		while (newCap < _len + 1) newCap <<= 1;
+		reserve(newCap);
+	}
+	_str[_len] = b;
+	_len++;
+	return *this;
+}
+
 std::wistream & operator>>(std::wistream & is, CharString & str)
 {
 	std::wstring wstr;
 	is >> wstr;
-	str._len = wstr.length();
-	delete[] str._str; str._str = new wchar_t[str._len];
-	for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
+	if (str._len < wstr.length()) {
+		str._len = str._capacity = wstr.length();
+		delete[] str._str; str._str = new wchar_t[str._len];
+		for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
+	}
+	else {
+		str._len = wstr.length();
+		for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
+	}
 	return is;
 }
 
