@@ -18,6 +18,8 @@ void WordSegmentor::loadDict(const char * dictFile)
 {
 	auto start = clock();
 
+	dict.reserve(350000);
+
 	/*freopen(dictFile, "r",stdin);
 	char c;
 	while ((c = getchar()) != EOF);*/

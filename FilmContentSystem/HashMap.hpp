@@ -48,10 +48,10 @@ private:
 				break;
 			}
 		if (newSize == hashSize)
-			throw std::bad_alloc();
+			throw std::length_error(""); //TODO
 
 		List** newHead = new List*[newSize]{nullptr};
-		for (int h = 0; h < newSize; h++) assert(newHead[h] == nullptr);
+		//for (int h = 0; h < newSize; h++) assert(newHead[h] == nullptr);
 
 		if (head != nullptr) {
 			for (unsigned h = 0; h < hashSize; h++) {
@@ -79,7 +79,7 @@ public:
 	}
 
 	void reserve(int capacity) {
-		if (capacity < 0) throw std::length_error();
+		if (capacity < 0) throw std::length_error(""); //TODO
 		realloc(capacity);
 	}
 	void insert(const key_t &key, const value_t & value) {

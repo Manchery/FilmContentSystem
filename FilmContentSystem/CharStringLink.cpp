@@ -9,7 +9,7 @@ CharStringLink::CharStringLink(const CharStringLink & b)
 	head = tail = nullptr;
 	for (node *p = b.head; p; p = p->next) {
 		node *newNode = new node{ p->str, nullptr, nullptr };
-		newNode->next = head; head = newNode;
+		newNode->prev = tail; tail->next = newNode; tail = newNode;
 	}
 }
 
@@ -19,7 +19,7 @@ CharStringLink & CharStringLink::operator=(const CharStringLink & b)
 	head = tail = nullptr;
 	for (node *p = b.head; p; p = p->next) {
 		node *newNode = new node{ p->str, nullptr, nullptr };
-		newNode->next = head; head = newNode;
+		newNode->prev = tail; tail->next = newNode; tail = newNode;
 	}
 	return *this;
 }
@@ -36,12 +36,12 @@ void CharStringLink::destructList(node * cur) {
 
 void CharStringLink::add_back(const CharString & s) {
 	node *newNode = new node{ s, nullptr, nullptr };
-	newNode->next = head; head = newNode;
+	newNode->next = head; head->prev = newNode; head = newNode;
 }
 
 void CharStringLink::add_front(const CharString & s) {
 	node *newNode = new node{ s, nullptr, nullptr };
-	newNode->prev = tail; tail = newNode;
+	newNode->prev = tail; tail->next = newNode; tail = newNode;
 }
 
 void CharStringLink::add(const CharString & s) { add_back(s); }

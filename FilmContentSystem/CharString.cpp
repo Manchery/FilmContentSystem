@@ -55,10 +55,9 @@ CharString::CharString(const std::wstring & wstr)
 	}
 }
 
-
 CharString::~CharString()
 {
-	delete _str;
+	delete[] _str;
 }
 
 wchar_t CharString::operator[](int x) const
@@ -95,19 +94,22 @@ int CharString::indexOf(CharString & b)
 		next[i] = k;
 	}
 
-	k = -1;
+	k = -1; int ans = -1;
 	for (int i = 0; i < _len; i++) {
 		while (~k && b[k + 1] != _str[i]) k = next[k];
 		if (b[k + 1] == _str[i]) k++;
-		if (k == blen - 1) return i - k + 1;
+		if (k == blen - 1) {
+			ans = i - k + 1; break;
+		}
 	}
-	return -1;
+	delete[] next;
+	return ans;
 }
 
 CharString& CharString::assign(const CharString & b)
 {
 	_len = b.length();
-	delete _str;
+	delete[] _str; _str = new wchar_t[_len];
 	memcpy(_str, b._str, sizeof(wchar_t)*_len);
 	return *this;
 }
@@ -121,7 +123,9 @@ std::wistream & operator>>(std::wistream & is, CharString & str)
 {
 	std::wstring wstr;
 	is >> wstr;
-	str._len = wstr.length(); for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
+	str._len = wstr.length();
+	delete[] str._str; str._str = new wchar_t[str._len];
+	for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];
 	return is;
 }
 
