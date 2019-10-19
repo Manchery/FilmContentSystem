@@ -7,7 +7,7 @@
 class FilmContentSystemApplication
 {
 private:
-	WordSegmentor seg;
+	WordSegmentor segmentor;
 	HtmlParser parser;
 public:
 	FilmContentSystemApplication();

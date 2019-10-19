@@ -1,30 +1,32 @@
 #include "FilmContentSystemApplication.h"
 #include <fstream>
 #include <sstream>
+#include <locale>
+#include <codecvt>
 using namespace std;
 
 void _main() {
 	FilmContentSystemApplication app; 
-	
-	//app.initDictionary("C:\\Users\\Manchery\\Desktop\\jieba\\dict2.txt", "C:\\Users\\Manchery\\Desktop\\jieba\\HMM3.txt");
 
-	wostringstream wsout;
-	wsout << app.extractInfo("C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\19.html");
-	wstring output = wsout.str();
+	app.initDictionary("C:\\Users\\Manchery\\Desktop\\jieba\\dict2.txt", "C:\\Users\\Manchery\\Desktop\\jieba\\HMM3.txt");
+	auto info = app.extractInfo("C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\19.html");
 
-	std::wofstream outFile("C:\\Users\\Manchery\\Desktop\\output.txt");
-	outFile << output;
+	std::wofstream wfout("C:\\Users\\Manchery\\Desktop\\output.txt");
+	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+	wfout << info;
+	wfout.close();
 
-	/*std::ofstream outFile("C:\\Users\\Manchery\\Desktop\\output.txt", std::ios::out);
-	outFile.write((char *)output.c_str(), output.length() * sizeof(wchar_t));
-	outFile.close();*/
-
-	// wfout <<'/'<< L"\u2002";
+	wfout.open("C:\\Users\\Manchery\\Desktop\\output2.txt");
+	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+	CharStringLink cuts = app.divideWords(info.introduction());
+	for (auto it = cuts.begin(); it != cuts.end(); ++it) {
+		wfout << *it << std::endl;
+	}
+	wfout.close();
 }
 
 int main() {
 	locale::global(locale("chs"));
-
 	_main();
 	_CrtDumpMemoryLeaks();
 	putchar('*');

@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="CharString.cpp" />
     <ClCompile Include="CharStringLink.cpp" />
+    <ClCompile Include="FastIO.cpp" />
     <ClCompile Include="FilmContentSystemApplication.cpp" />
     <ClCompile Include="FilmContentSystemMain.cpp" />
     <ClCompile Include="FilmInfo.cpp" />
