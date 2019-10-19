@@ -42,6 +42,9 @@
     <ClInclude Include="WordSegmentor.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="FastIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FilmContentSystemMain.cpp">

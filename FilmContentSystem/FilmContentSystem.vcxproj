@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClInclude Include="CharString.h" />
     <ClInclude Include="CharStringLink.h" />
+    <ClInclude Include="FastIO.h" />
     <ClInclude Include="FilmContentSystemApplication.h" />
     <ClInclude Include="FilmInfo.h" />
     <ClInclude Include="HashMap.hpp" />
