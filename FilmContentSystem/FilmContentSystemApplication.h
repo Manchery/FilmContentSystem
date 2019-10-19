@@ -11,7 +11,7 @@ public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();
 
-	void initDictionary(const char *filename);
+	void initDictionary(const char *dictFile, const char *hmmFile = nullptr);
 	FilmInfo extractInfo(const char *filename);
 	CharStringLink divideWords(const CharString &passage);
 };
