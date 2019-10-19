@@ -40,5 +40,9 @@ public:
 	void remove(const CharString &s);
 	void concat(const CharStringLink &b);
 	// void concat_move(const CharStringLink &b); // TODO: moved 之后不能delete
+
+	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
+
+std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 

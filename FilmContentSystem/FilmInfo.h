@@ -2,9 +2,12 @@
 
 #include "CharString.h"
 #include "CharStringLink.h"
+#include <iostream>
 
+class HtmlParser;
 class FilmInfo
 {
+	friend class HtmlParser;
 private:
 	CharString _name, _introduction;
 	CharStringLink _directors, _screenwriters, _stars, _genres, _regions, _languages, _dates, _durations, _alternates;
@@ -35,5 +38,9 @@ public:
 	void addDate(const CharString& x) { _dates.add(x); }
 	void addDuration(const CharString& x) { _durations.add(x); }
 	void addAlternate(const CharString& x) { _alternates.add(x); }
+
+	friend std::wostream & operator<<(std::wostream & os, const FilmInfo & info);
 };
+
+extern std::wostream & operator<<(std::wostream & os, const FilmInfo & info);
 

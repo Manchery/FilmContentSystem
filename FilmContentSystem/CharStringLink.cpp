@@ -104,3 +104,11 @@ void CharStringLink::concat(const CharStringLink & b)
 //	if (b.tail) tail = b.tail;
 //}
 
+std::wostream & operator<<(std::wostream & os, const CharStringLink & str)
+{
+	for (auto it = str.begin(); it != str.end(); ++it) {
+		if (it != str.begin()) os << " / ";
+		os << *it;
+	}
+	return os;
+}

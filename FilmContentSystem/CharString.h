@@ -37,12 +37,12 @@ public:
 	CharString& operator+=(wchar_t b);
 
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
-	friend std::wostream & operator << (std::wostream & os, CharString &str);
+	friend std::wostream & operator << (std::wostream & os, const CharString &str);
 	friend CharString concat(const CharString &a, const CharString &b);
 	friend bool operator==(const CharString &a, const CharString &b);
 };
 std::wistream & operator >> (std::wistream & is, CharString &str);
-std::wostream & operator << (std::wostream & os, CharString &str);
+std::wostream & operator << (std::wostream & os, const CharString &str);
 CharString concat(const CharString &a, const CharString &b);
 CharString operator + (const CharString &a, const CharString &b);
 bool operator==(const CharString &a, const CharString &b);

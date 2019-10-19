@@ -118,7 +118,8 @@ CharString& CharString::assign(const CharString & b)
 {
 	if (b._len > _capacity) {
 		_len = _capacity = b.length();
-		delete[] _str; _str = new wchar_t[_len];
+		delete[] _str; 
+		_str = new wchar_t[_len];
 		memcpy(_str, b._str, sizeof(wchar_t)*_len);
 	} else {
 		_len = b.length();
@@ -172,7 +173,7 @@ std::wistream & operator>>(std::wistream & is, CharString & str)
 	return is;
 }
 
-std::wostream & operator<<(std::wostream & os, CharString & str)
+std::wostream & operator<<(std::wostream & os, const CharString & str)
 {
 	for (int i = 0; i < str._len; i++) os << str._str[i];
 	return os;

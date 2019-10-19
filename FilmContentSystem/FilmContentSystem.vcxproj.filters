@@ -45,6 +45,9 @@
     <ClInclude Include="FastIO.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="HtmlParser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FilmContentSystemMain.cpp">
@@ -63,6 +66,9 @@
       <Filter>源文件\数据结构</Filter>
     </ClCompile>
     <ClCompile Include="WordSegmentor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HtmlParser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

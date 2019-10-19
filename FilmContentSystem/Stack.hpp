@@ -12,7 +12,7 @@ class Stack
 public:
 	using iterator = value_t * ;
 private:
-	iterator _stack;
+	value_t *_stack;
 	int _top, _capacity;
 public:
 	Stack() {
@@ -27,8 +27,9 @@ public:
 	void reverse(int cap) {
 		if (_capacity < cap) {
 			iterator newStack = new value_t[cap];
-			memcpy(newStack, _stack, size() * sizeof(value_t);
+			for (int i = 0; i <= _top; i++) newStack[i] = _stack[i];
 			delete[] _stack; _stack = newStack;
+			_capacity = cap;
 		}
 	}
 	void push(const value_t & item) {
@@ -42,7 +43,7 @@ public:
 			throw std::out_of_range(""); // TODO
 		--_top;
 	}
-	void top() const {
+	value_t top() const {
 		if (empty())
 			throw std::out_of_range(""); // TODO 
 		return _stack[_top];
