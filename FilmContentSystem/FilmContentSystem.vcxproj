@@ -123,7 +123,7 @@
   <ItemGroup>
     <ClInclude Include="CharString.h" />
     <ClInclude Include="CharStringLink.h" />
-    <ClInclude Include="FastIO.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="FilmContentSystemApplication.h" />
     <ClInclude Include="FilmInfo.h" />
     <ClInclude Include="HashMap.hpp" />
@@ -134,7 +134,7 @@
   <ItemGroup>
     <ClCompile Include="CharString.cpp" />
     <ClCompile Include="CharStringLink.cpp" />
-    <ClCompile Include="FastIO.cpp" />
+    <ClCompile Include="IO.cpp" />
     <ClCompile Include="FilmContentSystemApplication.cpp" />
     <ClCompile Include="FilmContentSystemMain.cpp" />
     <ClCompile Include="FilmInfo.cpp" />

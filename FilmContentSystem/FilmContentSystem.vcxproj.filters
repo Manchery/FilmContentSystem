@@ -42,10 +42,10 @@
     <ClInclude Include="WordSegmentor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FastIO.h">
+    <ClInclude Include="HtmlParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="HtmlParser.h">
+    <ClInclude Include="IO.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="HtmlParser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FastIO.cpp">
+    <ClCompile Include="IO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

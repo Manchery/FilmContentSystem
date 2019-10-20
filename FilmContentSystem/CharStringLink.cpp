@@ -9,22 +9,8 @@ CharStringLink::CharStringLink(const CharStringLink & b)
 {
 	head = tail = nullptr;
 	for (node *p = b.head; p; p = p->next) {
-		node *newNode = new node{ p->str, nullptr, nullptr };
-		if (!head) head = newNode;
-		newNode->prev = tail; if (tail) tail->next = newNode; tail = newNode;
+		push_back(new node{ p->str, nullptr, nullptr });
 	}
-}
-
-CharStringLink & CharStringLink::operator=(const CharStringLink & b)
-{
-	destructList(head);
-	head = tail = nullptr;
-	for (node *p = b.head; p; p = p->next) {
-		node *newNode = new node{ p->str, nullptr, nullptr };
-		if (!head) head = newNode;
-		newNode->prev = tail; if (tail) tail->next = newNode; tail = newNode;
-	}
-	return *this;
 }
 
 CharStringLink::~CharStringLink() {
@@ -37,19 +23,33 @@ void CharStringLink::destructList(node * cur) {
 	delete cur;
 }
 
-void CharStringLink::add_front(const CharString & s) {
+void CharStringLink::push_back(node * newNode)
+{
+	if (!head) head = newNode;
+	newNode->prev = tail; if (tail) tail->next = newNode; tail = newNode;
+}
+
+CharStringLink & CharStringLink::operator=(const CharStringLink & b)
+{
+	destructList(head);
+	head = tail = nullptr;
+	for (node *p = b.head; p; p = p->next) {
+		push_back(new node{ p->str, nullptr, nullptr });
+	}
+	return *this;
+}
+
+void CharStringLink::push_front(const CharString & s) {
 	node *newNode = new node{ s, nullptr, nullptr };
 	if (!tail) tail = newNode;
 	newNode->next = head; if (head) head->prev = newNode; head = newNode;
 }
 
-void CharStringLink::add_back(const CharString & s) {
-	node *newNode = new node{ s, nullptr, nullptr };
-	if (!head) head = newNode;
-	newNode->prev = tail; if (tail) tail->next = newNode; tail = newNode;
+void CharStringLink::puash_back(const CharString & s) {
+	push_back(new node{ s, nullptr, nullptr });
 }
 
-void CharStringLink::add(const CharString & s) { add_back(s); }
+void CharStringLink::add(const CharString & s) { puash_back(s); }
 
 int CharStringLink::search(const CharString & s) {
 	int idx = 0;
@@ -86,23 +86,9 @@ void CharStringLink::remove(const CharString & s) {
 void CharStringLink::concat(const CharStringLink & b)
 {
 	for (node *p = b.head; p; p = p->next) {
-		node *newNode = new node{ p->str, nullptr, nullptr };
-		if (!head) head = newNode;
-		newNode->prev = tail; if (tail) tail->next = newNode; tail = newNode;
+		push_back(new node{ p->str, nullptr, nullptr });
 	}
 }
-
-//void CharStringLink::concat_move(const CharStringLink & b)
-//{
-//	if (head == nullptr) {
-//		assert(tail == nullptr);
-//		head = b.head; tail = b.tail;
-//		return;
-//	}
-//	tail->next = b.head;
-//	if (b.head) b.head->prev = tail;
-//	if (b.tail) tail = b.tail;
-//}
 
 std::wostream & operator<<(std::wostream & os, const CharStringLink & str)
 {

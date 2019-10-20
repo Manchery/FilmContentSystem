@@ -1,12 +1,10 @@
 #include "WordSegmentor.h"
-#include "FastIO.h"
+#include "IO.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <algorithm>
 using std::max;
-
-
 
 WordSegmentor::WordSegmentor()
 {
@@ -21,37 +19,46 @@ WordSegmentor::~WordSegmentor()
 	delete[] probEmit;
 }
 
-void WordSegmentor::loadDict(const char * dictFile)
-{
-	loadDict_v1(dictFile);
-}
-
 int WordSegmentor::state2Idx(char s)
 {
-	switch (s)
-	{
-	case 'B':
-		return 0;
-	case 'E':
-		return 1;
-	case 'M':
-		return 2;
-	case 'S':
-		return 3;
-	default:
-		return -1;
+	switch (s){
+		case 'B': return 0;
+		case 'E': return 1;
+		case 'M': return 2;
+		case 'S': return 3;
+		default: return -1;
 	}
+}
+
+void WordSegmentor::loadDict(const char * dictFile)
+{
+	dict.reserve(350000);
+	numWords = 0; totalFreq = 0; maxWordLen = 0;
+
+	freopen(dictFile, "r", stdin);
+	const int MAXLEN = 100;
+	char cword[MAXLEN], POS[MAXLEN]; int freq; wchar_t word[MAXLEN];
+	int t;
+	while ((t = fast_read(cword)) != -1) {
+		fast_read(freq); fast_read(POS);
+		mbstowcs(word, cword, MAXLEN);
+
+		++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
+		dict[CharString(word)] = freq;
+	}
+	//freopen("CON", "r", stdin);
+	fclose(stdin);
 }
 
 void WordSegmentor::loadHMM(const char * hmmFile)
 {
-	bool readingStart = false, readingTrans = false, readingEmit = false;
-	int state;
-	char s[105];
-	
 	for (int i = 0; i < 4; i++) probStart[i] = -3.14e+100;
 	for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) probTrans[i][j] = -3.14e+100;
 	for (int i = 0; i < MAX_HAN_CODE; i++) for (int j = 0; j < 4; j++) probEmit[i][j] = -3.14e+100;
+
+	char s[105];
+	bool readingStart = false, readingTrans = false, readingEmit = false;
+	int emitState;
 
 	freopen(hmmFile, "r", stdin);
 	while (fast_read(s) != -1) {
@@ -59,10 +66,10 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 			fast_read(s);
 			if (strcmp(s, "prob_start") == 0) readingStart = true;
 			else if (strcmp(s, "prob_trans") == 0) readingTrans = true;
-			else if (strcmp(s, "prob_emit_B") == 0) readingEmit = true, state = 0;
-			else if (strcmp(s, "prob_emit_E") == 0) readingEmit = true, state = 1;
-			else if (strcmp(s, "prob_emit_M") == 0) readingEmit = true, state = 2;
-			else if (strcmp(s, "prob_emit_S") == 0) readingEmit = true, state = 3;
+			else if (strcmp(s, "prob_emit_B") == 0) readingEmit = true, emitState = 0;
+			else if (strcmp(s, "prob_emit_E") == 0) readingEmit = true, emitState = 1;
+			else if (strcmp(s, "prob_emit_M") == 0) readingEmit = true, emitState = 2;
+			else if (strcmp(s, "prob_emit_S") == 0) readingEmit = true, emitState = 3;
 			else if (strcmp(s, "end") == 0) readingEmit = readingStart = readingTrans = false;
 		}
 		else {
@@ -70,7 +77,7 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 			if (readingEmit) {
 				wchar_t word[5]; mbstowcs(word, s, 100);
 				fast_read(p);
-				probEmit[(int)word[0]][state] = p;
+				probEmit[(int)word[0]][emitState] = p;
 			}
 			else if (readingStart) {
 				fast_read(p); 
@@ -82,30 +89,10 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 			}
 		}
 	}
+	//freopen("CON", "r", stdin);
+	fclose(stdin);
 
 	hasHMM = true;
-	freopen("CON", "r", stdin);
-}
-
-CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM)
-{
-	CharStringLink res;
-	CharString sentence;
-	for (int i = 0; i < passage.length(); i++) {
-		if (isChinese(passage[i])) {
-			sentence += passage[i];
-		}
-		else {
-			res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
-			sentence.clear();
-			// res.add_back(passage[i]);
-		}
-	}
-	if (!sentence.empty()) {
-		res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
-		sentence.clear();
-	}
-	return res;
 }
 
 void WordSegmentor::viterbi(const CharString & sentense)
@@ -141,7 +128,38 @@ void WordSegmentor::viterbi(const CharString & sentense)
 	}
 }
 
-void WordSegmentor::dag(const CharString & sentense)
+CharStringLink WordSegmentor::cut_HMM(const CharString & sentense)
+{
+	CharStringLink res;
+	CharString buf; int len = sentense.length();
+	buf += sentense[0];
+	for (int i = 1; i <= len; i++) {
+		if (i == len || (isHan(sentense[i]) ^ isHan(sentense[i - 1]))) {
+			if (isHan(sentense[i - 1])) {
+				viterbi(buf); int startPos;
+				for (int j = 0; j < buf.length(); j++) {
+					if (optState[j] == 3) { // 'S'
+						res.puash_back(buf[j]);
+					}
+					else if (optState[j] == 0) { // 'B'
+						startPos = j;
+					}
+					else if (optState[j] == 1) { // 'E'
+						res.puash_back(buf.substring(startPos, j + 1));
+					}
+				}
+			}
+			else {
+				res.puash_back(buf);
+			}
+			buf.clear();
+		}
+		if (i < len) buf += sentense[i];
+	}
+	return res;
+}
+
+void WordSegmentor::calcDAG(const CharString & sentense)
 {
 	int len = sentense.length();
 	delete[] logProb; logProb = new double[len + 1];
@@ -170,51 +188,51 @@ void WordSegmentor::dag(const CharString & sentense)
 	}
 }
 
-CharStringLink WordSegmentor::cut_DAG(const CharString &sentense)
+CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM)
 {
-	dag(sentense);
 	CharStringLink res;
-	int p = 0, len = sentense.length();
-	while (p != len) {
-		res.add(sentense.substring(p, jump[p]));
-		p = jump[p];
-	} // TODO: 手动合并西文字符（没有HMM
+	CharString sentence;
+	for (int i = 0; i < passage.length(); i++) {
+		if (isChinese(passage[i])) {
+			sentence += passage[i];
+		}
+		else {
+			res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
+			sentence.clear();
+			// res.add_back(passage[i]); // 标点符号等
+		}
+	}
+	if (!sentence.empty()) {
+		res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
+		sentence.clear();
+	}
 	return res;
 }
 
-CharStringLink WordSegmentor::cut_HMM(const CharString & sentense)
+CharStringLink WordSegmentor::cut_DAG(const CharString &sentense)
 {
+	calcDAG(sentense);
+
 	CharStringLink res;
-	CharString buf; int len = sentense.length();
-	buf += sentense[0];
-	for (int i = 1; i <= len; i++) {
-		if (i==len || (isHan(sentense[i])^isHan(sentense[i-1]))) {
-			if (isHan(sentense[i-1])) {
-				viterbi(buf); int startPos;
-				for (int j = 0; j < buf.length(); j++) {
-					if (optState[j] == 3) { // 'S'
-						res.add_back(buf[j]);
-					}
-					else if (optState[j] == 0) { // 'B'
-						startPos = j;
-					}
-					else if (optState[j] == 1) { // 'E'
-						res.add_back(buf.substring(startPos, j + 1));
-					}
-				}
-			}else{
-				res.add_back(buf);
-			}
-			buf.clear();
+	int p = 0, len = sentense.length();
+	while (p != len) {
+		if (isHan(sentense[p])) {
+			res.add(sentense.substring(p, jump[p]));
+			p = jump[p];
 		}
-		if (i<len) buf += sentense[i];
-	}
+		else {	// 合并西文字符
+			int t = p; 
+			while (p != len && !isHan(sentense[p])) p = jump[p];
+			res.add(sentense.substring(t, p));
+		}
+	} 
 	return res;
 }
 
 CharStringLink WordSegmentor::cut_DAG_HMM(const CharString & sentense)
 {
-	dag(sentense);
+	calcDAG(sentense);
+
 	CharStringLink res;
 	int p = 0, len = sentense.length();
 	CharString buf;
@@ -243,80 +261,6 @@ CharStringLink WordSegmentor::cut_DAG_HMM(const CharString & sentense)
 	return res;
 }
 
-void WordSegmentor::loadDict_v1(const char * dictFile)
-{
-	dict.reserve(350000);
-	numWords = 0; totalFreq = 0; maxWordLen = 0;
-
-	freopen(dictFile, "r", stdin);
-	char cword[100], POS[100]; int freq; wchar_t word[100];
-	int t;
-	while ((t=fast_read(cword))!=-1) {
-		fast_read(freq); fast_read(POS);
-		mbstowcs(word, cword, 100);
-
-		++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
-		dict[CharString(word)] = freq;
-		/*if (numWords % 100000 == 0)
-			std::cout << numWords << std::endl;*/
-	}
-	freopen("CON", "r", stdin);
-}
-
-void WordSegmentor::loadDict_v2(const char * dictFile)
-{
-	dict.reserve(350000);
-	numWords = 0; totalFreq = 0;
-
-	FILE * pFile;
-	pFile = fopen(dictFile, "r");
-	wchar_t line[100];
-	wchar_t word[100] = { 0 }; int freq = 0;
-	if (pFile != NULL)
-	{
-		while (fgetws(line, 100, pFile) != NULL) { //TODO:unsafe
-			int p = -1; bool readFreq = false;
-			freq = 0;
-			for (int i = 0; i < wcslen(line); i++) {
-				if (line[i] == ' ') {
-					if (readFreq) break;
-					readFreq = true; continue;
-				}
-				if (readFreq)
-					freq = freq * 10 + line[i] - '0';
-				else
-					word[++p] = line[i];
-			}
-			word[++p] = 0;
-			//std::wcout << word << " " << freq << std::endl;
-
-			++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
-			dict[CharString(word)] = freq;
-			/*if (numWords % 100000 == 0)
-				std::cout << numWords << std::endl;*/
-		}
-		fclose(pFile);
-	}
-}
-
-void WordSegmentor::loadDict_v3(const char * dictFile)
-{
-	dict.reserve(350000);
-	numWords = 0; totalFreq = 0;
-
-	std::wifstream wfin = std::wifstream(dictFile);
-	wchar_t word[100], POS[100]; int freq;
-	while (!wfin.eof()) {
-		wfin >> word >> freq >> POS;
-
-		++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
-		dict[CharString(word)] = freq;
-		/*if (numWords % 100000 == 0)
-			std::cout << numWords << std::endl;*/
-	}
-	wfin.close();
-}
-
 bool isLower(wchar_t w) {
 	return 'a' <= w && w <= 'z';
 }
@@ -335,4 +279,8 @@ bool isHan(wchar_t w) {
 
 bool isChinese(wchar_t w) {
 	return isHan(w) || isLower(w) || isUpper(w) || isDigit(w);
+}
+
+bool isAlpha(wchar_t w) {
+	return isLower(w) || isUpper(w);
 }

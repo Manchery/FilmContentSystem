@@ -48,10 +48,10 @@ private:
 				break;
 			}
 		if (newSize == hashSize)
-			throw std::length_error(""); //TODO
+			throw std::length_error("Creating a too big hash table!"); 
 
 		List** newHead = new List*[newSize]{nullptr};
-		//for (int h = 0; h < newSize; h++) assert(newHead[h] == nullptr);
+		for (int h = 0; h < newSize; h++) assert(newHead[h] == nullptr);
 
 		if (head != nullptr) {
 			for (unsigned h = 0; h < hashSize; h++) {
@@ -78,8 +78,12 @@ public:
 		}
 	}
 
+	int size() const {
+		return _size;
+	}
+
 	void reserve(int capacity) {
-		if (capacity < 0) throw std::length_error(""); //TODO
+		if (capacity < 0) throw std::length_error("Capacity should be non-negative!"); //TODO
 		realloc(capacity);
 	}
 	void insert(const key_t &key, const value_t & value) {
@@ -88,10 +92,6 @@ public:
 		List* node = new List{ key, value, nullptr }; node->next = head[h]; head[h] = node;
 		_size++;
 	}
-	int size() const { 
-		return _size; 
-	}
-
 	bool find(const key_t &key) {
 		unsigned h = hashFunc(key) % hashSize;
 		for (List* p = head[h]; p; p = p->next)
@@ -100,14 +100,15 @@ public:
 		return false;
 	}
 	value_t& operator [](const key_t &key) {
-		if (hashSize == 0) realloc(hashSize + 1);
-		unsigned h = hashFunc(key) % hashSize;
-		for (List* p = head[h]; p; p = p->next)
-			if (p->key == key)
-				return p->value;
+		if (hashSize > 0) {
+			unsigned h = hashFunc(key) % hashSize;
+			for (List* p = head[h]; p; p = p->next)
+				if (p->key == key)
+					return p->value;
+		}
 
 		if (hashSize == 0 || _size == hashSize) realloc(hashSize + 1);
-		h = hashFunc(key) % hashSize;
+		unsigned h = hashFunc(key) % hashSize;
 		List* node = new List{ key, value_t(), nullptr }; node->next = head[h]; head[h] = node;
 		_size++;
 		return node->value;

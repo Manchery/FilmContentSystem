@@ -70,19 +70,19 @@ void CharString::reserve(int cap)
 
 wchar_t CharString::operator[](int x) const
 {
-	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
+	if (x < 0 || x >= _len) throw std::out_of_range("Index out of range!");
 	return _str[x];
 }
 
 wchar_t & CharString::operator[](int x)
 {
-	if (x < 0 || x >= _len) throw std::out_of_range(""); //TODO
+	if (x < 0 || x >= _len) throw std::out_of_range("Index out of range!");
 	return _str[x];
 }
 
 CharString CharString::substring(int l, int r) const {
 	if (l < 0 || r > _len)
-		throw std::out_of_range(""); // TODO
+		throw std::out_of_range("Index out of range!");
 	if (l >= r)
 		return CharString(L"");
 	CharString result(r - l);
@@ -90,7 +90,7 @@ CharString CharString::substring(int l, int r) const {
 	return result;
 }
 
-int CharString::indexOf(CharString & b) const
+int CharString::indexOf(CharString & b) const	// KMP
 {
 	int blen = b.length();
 	int *next = new int[blen];
@@ -161,7 +161,7 @@ std::wistream & operator>>(std::wistream & is, CharString & str)
 {
 	std::wstring wstr;
 	is >> wstr;
-	if (str._len < wstr.length()) {
+	if (str._capacity < wstr.length()) {
 		str._len = str._capacity = wstr.length();
 		delete[] str._str; str._str = new wchar_t[str._len];
 		for (int i = 0; i < str._len; i++) str._str[i] = wstr[i];

@@ -6,13 +6,13 @@
 wchar_t HtmlParser::prevChar()
 {
 	if (hp >= 2) return _html[hp - 2];
-	throw std::out_of_range(""); // TODO
+	throw std::out_of_range("The previous out of range!");
 }
 
 wchar_t HtmlParser::nextChar()
 {
 	if (hp < _html.length()) return _html[hp];
-	throw std::out_of_range(""); // TODO
+	throw std::out_of_range("The next out of range");
 }
 
 wchar_t HtmlParser::getChar() {
@@ -56,38 +56,29 @@ void HtmlParser::backSpace()
 	if (hp > 0) hp--;
 }
 
-static inline bool isAlpha(wchar_t w) {
-	return isLower(w) || isUpper(w);
-}
-
-static inline bool isName(wchar_t w) {
-	return isDigit(w) || isAlpha(w) || w == '-';
-}
-
 static inline bool notName(wchar_t w) {
-	return !isName(w);
+	return !isDigit(w) && !isAlpha(w) && w != '-';
 }
 static inline bool endOfTagName(wchar_t w) {
 	return iswblank(w) || w == '>'  || w == '/';
 }
 
-static int numSelfClosedTag = 16;
-static wchar_t selfClosedTag[][10] = { L"area", L"base", L"br", L"col", L"command", L"embed", L"hr", L"img", L"input", L"keygen", L"link", L"meta", L"param", L"source", L"track", L"wbr" };
-
-static bool isSelfClosed(const CharString &tag) {
-	for (int i = 0; i < numSelfClosedTag; i++)
-		if (tag == selfClosedTag[i])
-			return true;
-	return false;
+HtmlParser::HtmlParser()
+{
 }
 
-void HtmlParser::readTag(CharString & tagName, int & closeState, bool & isName, bool & isInfo, bool & isSummary)
+HtmlParser::~HtmlParser()
 {
-	closeState = 0;
-	if (nextChar() == '/') closeState = 1;
+}
+
+void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isName, bool & isInfo, bool & isSummary)
+{
+	closeState = OPEN;
+	if (nextChar() == '/') closeState = CLOSED;
 	skipBlock(isAlpha);
 	tagName = getBlock(endOfTagName); isInfo = false; isSummary = false; isName = false;
-	if (isSelfClosed(tagName)) closeState = 2;
+	if (tagName == L"title") isName = true;
+	if (isSelfClosed(tagName)) closeState = SELFCLOSED;
 
 	while (true){ // reading attribute
 		CharString key, value;
@@ -95,7 +86,7 @@ void HtmlParser::readTag(CharString & tagName, int & closeState, bool & isName, 
 		do w = getChar(); while (w != '>' && !isAlpha(w));
 		if (isAlpha(w)) backSpace();
 		else if (w == '>') {
-			if (prevChar() == '/') closeState = 2;
+			if (prevChar() == '/') closeState = SELFCLOSED;
 			return;
 		}
 
@@ -108,28 +99,26 @@ void HtmlParser::readTag(CharString & tagName, int & closeState, bool & isName, 
 				isInfo = true;
 			if (key == L"property" && value == L"v:summary")
 				isSummary = true;
-			if (key == L"property" &&value == L"v:itemreviewed")
-				isName = true;
+			/*if (key == L"property" &&value == L"v:itemreviewed")
+				isName = true;*/
 		}
 		else if (isAlpha(w)) {
 			backSpace(); continue;
 		}
 		else if (w == '>') {
-			if (prevChar() == '/') closeState = 2;
+			if (prevChar() == '/') closeState = SELFCLOSED;
 			return;
 		}
 	}
 }
 
-
-HtmlParser::HtmlParser()
+CharString HtmlParser::postProcessName(const CharString & name)
 {
+	int l = 0, r = name.length()-1;
+	while (l <= r && iswspace(name[l])) l++;
+	while (l <= r && iswspace(name[r])) r--;
+	return name.substring(l, r + 1 - 4); // 4 for （豆瓣）
 }
-
-HtmlParser::~HtmlParser()
-{
-}
-
 
 CharString HtmlParser::postProcessSummary(const CharString & summary)
 {
@@ -154,7 +143,7 @@ void HtmlParser::postProcessInfo(const CharString & info, CharStringLink * item)
 			int l = last + 1, r = i - 1;
 			while (l <= r && iswspace(info[l])) l++;
 			while (l <= r && iswspace(info[r])) r--;
-			item->add_back(info.substring(l, r + 1));
+			item->puash_back(info.substring(l, r + 1));
 			last = i + 1;
 		}
 	}
@@ -198,11 +187,11 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 		else {
 			CharString tagName;
 			bool isInfo, isSummary, isName;
-			int closeState; // TODO: enum 0: open 1: closed 2: self-closed
+			TagState closeState;
 			
 			readTag(tagName, closeState, isName, isInfo, isSummary);
 
-			if (closeState == 0) {
+			if (closeState == OPEN) {
 				tags.push(tagName);
 				if (isInfo) 
 					readingInfo = true, important = tags.size();
@@ -211,12 +200,12 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 				if (isName)
 					readingName = true, important = tags.size();
 			}
-			else if (closeState == 1) {
+			else if (closeState == CLOSED) {
 				while (!(tags.top() == tagName)) tags.pop();  // 未正确关闭的标签
 				tags.pop();
 				if (tags.size() < important) {
 					if (readingName) {
-						info.setName(readed);
+						info.setName(postProcessName(readed));
 						readed.clear();
 					}
 					if (readingSummary) {
@@ -226,7 +215,7 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 					important = -1, readingInfo = readingSummary = readingName = false;
 				}
 			}
-			else if (closeState == 2) {
+			else if (closeState == SELFCLOSED) {
 				if (readingInfoItem && tagName == L"br") {
 					postProcessInfo(readed, item);
 					readingInfoItem = false;
@@ -240,4 +229,11 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 	}
 
 	return info;
+}
+
+bool isSelfClosed(const CharString & tag) {
+	for (int i = 0; i < NUM_SELF_CLOSED_TAG; i++)
+		if (tag == SELF_CLOSED_TAG[i])
+			return true;
+	return false;
 }

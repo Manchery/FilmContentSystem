@@ -23,24 +23,29 @@ public:
 
 	int length() const { return _len; }
 	int capacity() const { return _capacity; }
-	void reserve(int cap);
 	void clear() { _len = 0; }
 	bool empty() const { return _len == 0; }
+
+	void reserve(int cap);
 
 	wchar_t operator [](int x) const;
 	wchar_t& operator [](int x);
 	CharString substring(int l, int r) const;
-	int indexOf(CharString &b) const;
+
 	CharString& assign(const CharString &b);
 	CharString& operator=(const CharString &b);
+	
 	CharString& operator+=(const CharString &b);
 	CharString& operator+=(wchar_t b);
+
+	int indexOf(CharString &b) const; // TODO: unit test
 
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
 	friend std::wostream & operator << (std::wostream & os, const CharString &str);
 	friend CharString concat(const CharString &a, const CharString &b);
 	friend bool operator==(const CharString &a, const CharString &b);
 };
+
 std::wistream & operator >> (std::wistream & is, CharString &str);
 std::wostream & operator << (std::wostream & os, const CharString &str);
 CharString concat(const CharString &a, const CharString &b);

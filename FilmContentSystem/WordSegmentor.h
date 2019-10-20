@@ -18,18 +18,15 @@ class WordSegmentor
 	double probTrans[4][4];
 	bool hasHMM;
 
-	void loadDict_v1(const char *dictFile);
-	void loadDict_v2(const char *dictFile);
-	void loadDict_v3(const char *dictFile);
-
 	double *logProb; int *jump;
 	double(*vit)[4]; int *optState;
 
 	void viterbi(const CharString& sentense);
-	void dag(const CharString &sentense);
-	
 	CharStringLink cut_HMM(const CharString &sentense);
-	CharStringLink cut_DAG(const CharString &sentense);
+
+	void calcDAG(const CharString &sentense);
+	
+	CharStringLink cut_DAG(const CharString &sentense); // TODO: unit test
 	CharStringLink cut_DAG_HMM(const CharString &sentense);
 public:
 	WordSegmentor();
@@ -42,6 +39,6 @@ public:
 extern bool isLower(wchar_t w);
 extern bool isUpper(wchar_t w);
 extern bool isDigit(wchar_t w);
+extern bool isAlpha(wchar_t w);
 extern bool isHan(wchar_t w);
 extern bool isChinese(wchar_t w);
-

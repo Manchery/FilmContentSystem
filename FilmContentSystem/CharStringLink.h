@@ -14,6 +14,8 @@ private:
 	node *head, *tail;
 	void destructList(node *cur);
 
+	void push_back(node *newNode);
+
 public:
 	class iterator {
 		node *cur;
@@ -30,16 +32,17 @@ public:
 public:
 	CharStringLink();
 	CharStringLink(const CharStringLink &b);
-	CharStringLink& operator = (const CharStringLink &b);
 	~CharStringLink();
-	void add_back(const CharString &s);
-	void add_front(const CharString &s);
+
+	CharStringLink& operator = (const CharStringLink &b);
+	
+	void puash_back(const CharString &s);
+	void push_front(const CharString &s);
 	void add(const CharString &s);
 	int search(const CharString &s);
 	void remove(node *x);
 	void remove(const CharString &s);
 	void concat(const CharStringLink &b);
-	// void concat_move(const CharStringLink &b); // TODO: moved 之后不能delete
 
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
