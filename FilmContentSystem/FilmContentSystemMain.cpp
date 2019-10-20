@@ -19,10 +19,18 @@ bool endsWith(const char * str, const char *end) {
 void _main() {
 	FilmContentSystemApplication app; 
 
-	const char dictFile[] = "C:\\Users\\Manchery\\Desktop\\jieba\\dict2.txt";
-	const char hmmFile[] = "C:\\Users\\Manchery\\Desktop\\jieba\\HMM3.txt";
+#ifdef _DEBUG
+	const char dictFile[] = "C:\\Users\\Manchery\\Desktop\\实验1材料\\dict\\dict.txt";
+	const char hmmFile[] = "C:\\Users\\Manchery\\Desktop\\实验1材料\\dict\\HMM.txt";
 	const char inputDir[] = "C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\";
 	const char outputDir[] = "C:\\Users\\Manchery\\Desktop\\实验1材料\\output\\";
+#else
+	const char dictFile[] = "dict\\dict.txt";
+	const char hmmFile[] = "dict\\HMM.txt";
+	const char inputDir[] = "input\\";
+	const char outputDir[] = "output\\";
+#endif
+
 	_mkdir(outputDir);
 
 	app.initDictionary(dictFile, hmmFile);

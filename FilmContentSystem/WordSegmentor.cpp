@@ -32,67 +32,75 @@ int WordSegmentor::state2Idx(char s)
 
 void WordSegmentor::loadDict(const char * dictFile)
 {
-	dict.reserve(350000);
-	numWords = 0; totalFreq = 0; maxWordLen = 0;
+	if (freopen(dictFile, "r", stdin)) {
+		dict.reserve(350000);
+		numWords = 0; totalFreq = 0; maxWordLen = 0;
 
-	freopen(dictFile, "r", stdin);
-	const int MAXLEN = 100;
-	char cword[MAXLEN], POS[MAXLEN]; int freq; wchar_t word[MAXLEN];
-	int t;
-	while ((t = fast_read(cword)) != -1) {
-		fast_read(freq); fast_read(POS);
-		mbstowcs(word, cword, MAXLEN);
+		const int MAXLEN = 100;
+		char cword[MAXLEN], POS[MAXLEN]; int freq; wchar_t word[MAXLEN];
+		int t;
+		while ((t = fast_read(cword)) != -1) {
+			fast_read(freq); fast_read(POS);
+			mbstowcs(word, cword, MAXLEN);
 
-		++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
-		dict[CharString(word)] = freq;
+			++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
+			dict[CharString(word)] = freq;
+		}
+		//freopen("CON", "r", stdin);
+		fclose(stdin);
 	}
-	//freopen("CON", "r", stdin);
-	fclose(stdin);
+	else {
+		throw std::runtime_error("Dictionary file not found!");
+	}
 }
 
 void WordSegmentor::loadHMM(const char * hmmFile)
 {
-	for (int i = 0; i < 4; i++) probStart[i] = -3.14e+100;
-	for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) probTrans[i][j] = -3.14e+100;
-	for (int i = 0; i < MAX_HAN_CODE; i++) for (int j = 0; j < 4; j++) probEmit[i][j] = -3.14e+100;
+	if (freopen(hmmFile, "r", stdin)) {
+		for (int i = 0; i < 4; i++) probStart[i] = -3.14e+100;
+		for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) probTrans[i][j] = -3.14e+100;
+		for (int i = 0; i < MAX_HAN_CODE; i++) for (int j = 0; j < 4; j++) probEmit[i][j] = -3.14e+100;
 
-	char s[105];
-	bool readingStart = false, readingTrans = false, readingEmit = false;
-	int emitState;
+		char s[105];
+		bool readingStart = false, readingTrans = false, readingEmit = false;
+		int emitState;
 
-	freopen(hmmFile, "r", stdin);
-	while (fast_read(s) != -1) {
-		if (strcmp(s, "#") == 0) {
-			fast_read(s);
-			if (strcmp(s, "prob_start") == 0) readingStart = true;
-			else if (strcmp(s, "prob_trans") == 0) readingTrans = true;
-			else if (strcmp(s, "prob_emit_B") == 0) readingEmit = true, emitState = 0;
-			else if (strcmp(s, "prob_emit_E") == 0) readingEmit = true, emitState = 1;
-			else if (strcmp(s, "prob_emit_M") == 0) readingEmit = true, emitState = 2;
-			else if (strcmp(s, "prob_emit_S") == 0) readingEmit = true, emitState = 3;
-			else if (strcmp(s, "end") == 0) readingEmit = readingStart = readingTrans = false;
+		while (fast_read(s) != -1) {
+			if (strcmp(s, "#") == 0) {
+				fast_read(s);
+				if (strcmp(s, "prob_start") == 0) readingStart = true;
+				else if (strcmp(s, "prob_trans") == 0) readingTrans = true;
+				else if (strcmp(s, "prob_emit_B") == 0) readingEmit = true, emitState = 0;
+				else if (strcmp(s, "prob_emit_E") == 0) readingEmit = true, emitState = 1;
+				else if (strcmp(s, "prob_emit_M") == 0) readingEmit = true, emitState = 2;
+				else if (strcmp(s, "prob_emit_S") == 0) readingEmit = true, emitState = 3;
+				else if (strcmp(s, "end") == 0) readingEmit = readingStart = readingTrans = false;
+			}
+			else {
+				double p;
+				if (readingEmit) {
+					wchar_t word[5]; mbstowcs(word, s, 100);
+					fast_read(p);
+					probEmit[(int)word[0]][emitState] = p;
+				}
+				else if (readingStart) {
+					fast_read(p);
+					probStart[state2Idx(s[0])] = p;
+				}
+				else if (readingTrans) {
+					char s2[5]; fast_read(s2); fast_read(p);
+					probTrans[state2Idx(s[0])][state2Idx(s2[0])] = p;
+				}
+			}
 		}
-		else {
-			double p;
-			if (readingEmit) {
-				wchar_t word[5]; mbstowcs(word, s, 100);
-				fast_read(p);
-				probEmit[(int)word[0]][emitState] = p;
-			}
-			else if (readingStart) {
-				fast_read(p); 
-				probStart[state2Idx(s[0])] = p;
-			}
-			else if (readingTrans) {
-				char s2[5]; fast_read(s2); fast_read(p);
-				probTrans[state2Idx(s[0])][state2Idx(s2[0])] = p;
-			}
-		}
+		//freopen("CON", "r", stdin);
+		fclose(stdin);
+
+		hasHMM = true;
 	}
-	//freopen("CON", "r", stdin);
-	fclose(stdin);
-
-	hasHMM = true;
+	else {
+		throw std::runtime_error("HMM file not found!");
+	}
 }
 
 void WordSegmentor::viterbi(const CharString & sentense)
