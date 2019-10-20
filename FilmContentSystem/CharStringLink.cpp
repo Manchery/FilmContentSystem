@@ -45,11 +45,11 @@ void CharStringLink::push_front(const CharString & s) {
 	newNode->next = head; if (head) head->prev = newNode; head = newNode;
 }
 
-void CharStringLink::puash_back(const CharString & s) {
+void CharStringLink::push_back(const CharString & s) {
 	push_back(new node{ s, nullptr, nullptr });
 }
 
-void CharStringLink::add(const CharString & s) { puash_back(s); }
+void CharStringLink::add(const CharString & s) { push_back(s); }
 
 int CharStringLink::search(const CharString & s) {
 	int idx = 0;

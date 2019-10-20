@@ -36,7 +36,7 @@ public:
 
 	CharStringLink& operator = (const CharStringLink &b);
 	
-	void puash_back(const CharString &s);
+	void push_back(const CharString &s);
 	void push_front(const CharString &s);
 	void add(const CharString &s);
 	int search(const CharString &s);

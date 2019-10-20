@@ -139,11 +139,12 @@ void HtmlParser::postProcessInfo(const CharString & info, CharStringLink * item)
 	if (info[0] == ':') start++;
 	int last = start - 1;
 	for (int i = start; i <= len; i++) {
-		if (i == len || (i - 1 >= 0 && i + 1 < len && info[i - 1] == ' ' && info[i] == '/' && info[i + 1] == ' ')) {
+		// if (i == len || (i - 1 >= 0 && i + 1 < len && info[i - 1] == ' ' && info[i] == '/' && info[i + 1] == ' ')) {
+		if (i == len || info[i] == '/' ) {
 			int l = last + 1, r = i - 1;
 			while (l <= r && iswspace(info[l])) l++;
 			while (l <= r && iswspace(info[r])) r--;
-			item->puash_back(info.substring(l, r + 1));
+			item->push_back(info.substring(l, r + 1));
 			last = i + 1;
 		}
 	}

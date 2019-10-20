@@ -9,7 +9,7 @@ void _main() {
 	FilmContentSystemApplication app; 
 
 	app.initDictionary("C:\\Users\\Manchery\\Desktop\\jieba\\dict2.txt", "C:\\Users\\Manchery\\Desktop\\jieba\\HMM3.txt");
-	auto info = app.extractInfo("C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\5.html");
+	auto info = app.extractInfo("C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\11.html");
 
 	std::wofstream wfout("C:\\Users\\Manchery\\Desktop\\output.txt");
 	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));

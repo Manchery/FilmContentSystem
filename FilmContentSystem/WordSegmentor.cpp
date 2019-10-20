@@ -139,18 +139,18 @@ CharStringLink WordSegmentor::cut_HMM(const CharString & sentense)
 				viterbi(buf); int startPos;
 				for (int j = 0; j < buf.length(); j++) {
 					if (optState[j] == 3) { // 'S'
-						res.puash_back(buf[j]);
+						res.push_back(buf[j]);
 					}
 					else if (optState[j] == 0) { // 'B'
 						startPos = j;
 					}
 					else if (optState[j] == 1) { // 'E'
-						res.puash_back(buf.substring(startPos, j + 1));
+						res.push_back(buf.substring(startPos, j + 1));
 					}
 				}
 			}
 			else {
-				res.puash_back(buf);
+				res.push_back(buf);
 			}
 			buf.clear();
 		}
