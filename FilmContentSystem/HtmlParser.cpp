@@ -99,6 +99,8 @@ void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isN
 				isInfo = true;
 			if (key == L"property" && value == L"v:summary")
 				isSummary = true;
+			if (key == L"class" && value == L"all hidden")
+				isSummary = true;
 			/*if (key == L"property" &&value == L"v:itemreviewed")
 				isName = true;*/
 		}
