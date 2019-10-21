@@ -1,5 +1,5 @@
 #include "HtmlParser.h"
-#include "WordSegmentor.h"
+#include "common.h"
 #include <cctype>
 
 

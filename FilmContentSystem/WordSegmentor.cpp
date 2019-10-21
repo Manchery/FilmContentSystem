@@ -1,5 +1,5 @@
 #include "WordSegmentor.h"
-#include "IO.h"
+#include "common.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -10,6 +10,8 @@ WordSegmentor::WordSegmentor()
 {
 	hasHMM = false;
 	probEmit = new double[MAX_HAN_CODE][4];
+	logProb = nullptr; jump = nullptr;
+	vit = nullptr; optState = nullptr;
 }
 
 WordSegmentor::~WordSegmentor()
@@ -47,6 +49,7 @@ void WordSegmentor::loadDict(const char * dictFile)
 			dict[CharString(word)] = freq;
 		}
 		//freopen("CON", "r", stdin);
+		clear_buf();
 		fclose(stdin);
 	}
 	else {
@@ -94,13 +97,19 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 			}
 		}
 		//freopen("CON", "r", stdin);
+		clear_buf();
 		fclose(stdin);
 
 		hasHMM = true;
 	}
 	else {
-		throw std::runtime_error("HMM file not found!");
+		std::cerr << "HMM file not found!" << std::endl;
+		hasHMM = false;
 	}
+}
+
+void WordSegmentor::loadStopwords(const char * stopwordsFile) // TODO
+{
 }
 
 void WordSegmentor::viterbi(const CharString & sentense)
@@ -267,28 +276,4 @@ CharStringLink WordSegmentor::cut_DAG_HMM(const CharString & sentense)
 		buf.clear();
 	}
 	return res;
-}
-
-bool isLower(wchar_t w) {
-	return 'a' <= w && w <= 'z';
-}
-
-bool isUpper(wchar_t w) {
-	return 'A' <= w && w <= 'Z';
-}
-
-bool isDigit(wchar_t w) {
-	return '0' <= w && w <= '9';
-}
-
-bool isHan(wchar_t w) {
-	return L'Ò»' <= w && w <= L'ý›';
-}
-
-bool isChinese(wchar_t w) {
-	return isHan(w) || isLower(w) || isUpper(w) || isDigit(w);
-}
-
-bool isAlpha(wchar_t w) {
-	return isLower(w) || isUpper(w);
 }

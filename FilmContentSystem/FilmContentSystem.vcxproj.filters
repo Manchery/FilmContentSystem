@@ -45,7 +45,7 @@
     <ClInclude Include="HtmlParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="IO.h">
+    <ClInclude Include="common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="HtmlParser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="IO.cpp">
+    <ClCompile Include="common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

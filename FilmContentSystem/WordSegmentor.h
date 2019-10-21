@@ -8,7 +8,7 @@ const int MAX_HAN_CODE = 50000;
 
 class WordSegmentor
 {
-	HashMap < CharString, int, charStringHash > dict;
+	HashMap < CharString, int, charStringHash > dict, stopwords;
 	int totalFreq, numWords;
 	int maxWordLen;
 	
@@ -33,12 +33,6 @@ public:
 	~WordSegmentor();
 	void loadDict(const char *dictFile);
 	void loadHMM(const char *hmmFile);
+	void loadStopwords(const char *stopwordsFile);
 	CharStringLink cut(const CharString &passage, bool useHMM = true);
 };
-
-extern bool isLower(wchar_t w);
-extern bool isUpper(wchar_t w);
-extern bool isDigit(wchar_t w);
-extern bool isAlpha(wchar_t w);
-extern bool isHan(wchar_t w);
-extern bool isChinese(wchar_t w);
