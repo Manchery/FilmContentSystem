@@ -23,6 +23,7 @@ public:
 		iterator(node * n):cur(n) {}
 		CharString &operator *() { return cur->str; }
 		iterator& operator ++ () { cur = cur->next; return *this; }
+		iterator next() const { return iterator(cur->next); }
 		bool operator == (const iterator & b) { return cur == b.cur; }
 		bool operator != (const iterator & b) { return cur != b.cur; }
 	};

@@ -27,5 +27,7 @@ extern bool isDigit(wchar_t w);
 extern bool isAlpha(wchar_t w);
 extern bool isHan(wchar_t w);
 extern bool isChinese(wchar_t w);
+class CharString;
+extern bool isNumber(const CharString &str);
 
 extern bool endsWith(const char * str, const char *end);

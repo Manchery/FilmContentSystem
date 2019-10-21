@@ -1,4 +1,5 @@
 # include "common.h"
+# include "CharString.h"
 
 char fast_getchar() {
 	static char buf[100000], *p1 = buf, *p2 = buf;
@@ -77,6 +78,14 @@ bool isChinese(wchar_t w) {
 }
 bool isAlpha(wchar_t w) {
 	return isLower(w) || isUpper(w);
+}
+
+bool isNumber(const CharString & str)
+{
+	for (int i = 0; i < str.length(); i++)
+		if (!isDigit(str[i]))
+			return false;
+	return true;
 }
 
 bool endsWith(const char * str, const char * end) {

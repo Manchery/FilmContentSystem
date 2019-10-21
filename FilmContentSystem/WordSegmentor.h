@@ -9,16 +9,20 @@ const int MAX_HAN_CODE = 50000;
 class WordSegmentor
 {
 	HashMap < CharString, int, charStringHash > dict, stopwords;
+	
+	int *numeralFreq;
+	
 	int totalFreq, numWords;
 	int maxWordLen;
 
+	bool toConcatNumerals;
 	bool hasStopwords;
-	
+	bool hasHMM;
+
 	static int state2Idx(char s);
 	double (*probEmit)[4];
 	double probStart[4];
 	double probTrans[4][4];
-	bool hasHMM;
 
 	double *logProb; int *jump;
 	double(*vit)[4]; int *optState;
@@ -31,6 +35,7 @@ class WordSegmentor
 	CharStringLink cut_DAG(const CharString &sentense); // TODO: unit test
 	CharStringLink cut_DAG_HMM(const CharString &sentense);
 
+	CharStringLink concatNumerals(const CharStringLink &words);
 	CharStringLink removeStopwords(const CharStringLink& words);
 public:
 	WordSegmentor();

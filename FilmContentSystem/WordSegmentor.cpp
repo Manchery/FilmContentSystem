@@ -12,6 +12,14 @@ WordSegmentor::WordSegmentor()
 	probEmit = new double[MAX_HAN_CODE][4];
 	logProb = nullptr; jump = nullptr;
 	vit = nullptr; optState = nullptr;
+
+	toConcatNumerals = true;
+	if (toConcatNumerals) {
+		numeralFreq = new int[MAX_HAN_CODE];
+		memset(numeralFreq, 0, sizeof(int)*MAX_HAN_CODE);
+	}
+	else
+		numeralFreq = nullptr;
 }
 
 WordSegmentor::~WordSegmentor()
@@ -19,6 +27,7 @@ WordSegmentor::~WordSegmentor()
 	delete[] logProb; delete[] jump;
 	delete[] vit; delete[] optState;
 	delete[] probEmit;
+	delete[] numeralFreq;
 }
 
 int WordSegmentor::state2Idx(char s)
@@ -35,7 +44,7 @@ int WordSegmentor::state2Idx(char s)
 void WordSegmentor::loadDict(const char * dictFile)
 {
 	if (freopen(dictFile, "r", stdin)) {
-		dict.reserve(350000);
+		dict.reserve(350000); 
 		numWords = 0; totalFreq = 0; maxWordLen = 0;
 
 		const int MAXLEN = 100;
@@ -46,7 +55,10 @@ void WordSegmentor::loadDict(const char * dictFile)
 			mbstowcs(word, cword, MAXLEN);
 
 			++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
-			dict[CharString(word)] = freq;
+			dict[word] = freq;
+
+			if (toConcatNumerals && strcmp(POS, "m") == 0)
+				numeralFreq[word[wcslen(word) - 1]]++;
 		}
 		//freopen("CON", "r", stdin);
 		clear_buf();
@@ -149,7 +161,7 @@ void WordSegmentor::viterbi(const CharString & sentense)
 			vit[i][j] += probEmit[(int)sentense[i]][j];
 		}
 
-	int k = 0;
+	int k = 1;
 	for (int j = 0; j < 4; j++)
 		if (j == 1 || j == 3) // 'E' or 'S'
 			if (vit[len - 1][j] > vit[len - 1][k])
@@ -243,7 +255,22 @@ CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM, bool u
 		res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
 		sentence.clear();
 	}
+	if (toConcatNumerals) res = concatNumerals(res);
 	return hasStopwords && useStopwords ? removeStopwords(res) : res;
+}
+
+CharStringLink WordSegmentor::concatNumerals(const CharStringLink & words)
+{
+	CharStringLink res;
+	const int nFreqThreshold = 10;
+	for (auto it = words.begin(); it != words.end(); ++it)
+		if (isNumber(*it) && it.next()!=words.end() 
+			&& numeralFreq!=nullptr && numeralFreq[(*(it.next())).back()]>nFreqThreshold) {
+			res.push_back(concat(*it, *(it.next())));
+			++it;
+		}else
+			res.push_back(*it);
+	return res;
 }
 
 CharStringLink WordSegmentor::removeStopwords(const CharStringLink & words)

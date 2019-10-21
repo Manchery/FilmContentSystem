@@ -25,6 +25,7 @@ public:
 	int capacity() const { return _capacity; }
 	void clear() { _len = 0; }
 	bool empty() const { return _len == 0; }
+	wchar_t back() const { return _str[_len - 1]; }
 
 	void reserve(int cap);
 
