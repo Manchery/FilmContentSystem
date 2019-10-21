@@ -11,6 +11,8 @@ class WordSegmentor
 	HashMap < CharString, int, charStringHash > dict, stopwords;
 	int totalFreq, numWords;
 	int maxWordLen;
+
+	bool hasStopwords;
 	
 	static int state2Idx(char s);
 	double (*probEmit)[4];
@@ -28,11 +30,13 @@ class WordSegmentor
 	
 	CharStringLink cut_DAG(const CharString &sentense); // TODO: unit test
 	CharStringLink cut_DAG_HMM(const CharString &sentense);
+
+	CharStringLink removeStopwords(const CharStringLink& words);
 public:
 	WordSegmentor();
 	~WordSegmentor();
 	void loadDict(const char *dictFile);
 	void loadHMM(const char *hmmFile);
 	void loadStopwords(const char *stopwordsFile);
-	CharStringLink cut(const CharString &passage, bool useHMM = true);
+	CharStringLink cut(const CharString &passage, bool useHMM = true, bool useStopwords = false);
 };

@@ -23,7 +23,7 @@ void _debug(const char *dictFile, const char *hmmFile, const char *inputFile, co
 
 	wfout.open(txtFile);
 	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-	CharStringLink cuts = app.divideWords(info.introduction());
+	CharStringLink cuts = app.divideWords(info.introduction(), true, false);
 	for (auto it = cuts.begin(); it != cuts.end(); ++it) {
 		wfout << *it << std::endl;
 	}

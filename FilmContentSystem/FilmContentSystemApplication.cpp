@@ -77,7 +77,7 @@ void FilmContentSystemApplication::run()
 
 	_mkdir(outputDir);
 
-	initDictionary(dictFile, hmmFile);
+	initDictionary(dictFile, hmmFile, stopwordsFile);
 
 	_finddata_t file;
 	long lf; const int MAX_FILE_NAME_LEN = 1000;
@@ -115,7 +115,7 @@ void FilmContentSystemApplication::run()
 
 			wfout.open(txtFile);
 			wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-			CharStringLink cuts = divideWords(info.introduction());
+			CharStringLink cuts = divideWords(info.introduction(), useHMM, useStopwords);
 			for (auto it = cuts.begin(); it != cuts.end(); ++it) {
 				wfout << *it << std::endl;
 			}
@@ -161,10 +161,11 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 	//return parser.parse(read_utf8_file(htmlFile));
 }
 
-CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage)
+
+CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
 	auto start = clock();
-	CharStringLink res = segmentor.cut(passage);
+	CharStringLink res = segmentor.cut(passage, useHMM, useStopwords);
 	std::cerr << "Segmenting summary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 
 	return res;

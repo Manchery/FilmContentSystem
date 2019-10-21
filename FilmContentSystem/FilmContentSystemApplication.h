@@ -37,6 +37,6 @@ public:
 
 	void initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);
 	FilmInfo extractInfo(const char *htmlFile);
-	CharStringLink divideWords(const CharString &passage);
+	CharStringLink divideWords(const CharString &passage, bool useHMM, bool useStopwords);
 };
 

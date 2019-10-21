@@ -164,20 +164,20 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 		if (!readingInfo && !readingSummary && !readingName)
 			skipBlock('<');
 		else {
-			CharString tmp;
-			tmp = getBlock('<');
+			CharString block;
+			block = getBlock('<');
 			if (readingInfoItem || readingName || readingSummary)
-				readed += tmp;
+				readed += block;
 			else {
-				if (tmp == L"导演") item = &info._directors, readingInfoItem = true;
-				else if (tmp == L"编剧") item = &info._screenwriters, readingInfoItem = true;
-				else if (tmp == L"主演") item = &info._stars, readingInfoItem = true;
-				else if (tmp == L"类型:") item = &info._genres, readingInfoItem = true;
-				else if (tmp == L"制片国家/地区:") item = &info._regions, readingInfoItem = true;
-				else if (tmp == L"语言:") item = &info._languages, readingInfoItem = true;
-				else if (tmp == L"上映日期:") item = &info._dates, readingInfoItem = true;
-				else if (tmp == L"片长:") item = &info._durations, readingInfoItem = true;
-				else if (tmp == L"又名:") item = &info._alternates, readingInfoItem = true;
+				if (block == L"导演") item = &info._directors, readingInfoItem = true;
+				else if (block == L"编剧") item = &info._screenwriters, readingInfoItem = true;
+				else if (block == L"主演") item = &info._stars, readingInfoItem = true;
+				else if (block == L"类型:") item = &info._genres, readingInfoItem = true;
+				else if (block == L"制片国家/地区:") item = &info._regions, readingInfoItem = true;
+				else if (block == L"语言:") item = &info._languages, readingInfoItem = true;
+				else if (block == L"上映日期:") item = &info._dates, readingInfoItem = true;
+				else if (block == L"片长:") item = &info._durations, readingInfoItem = true;
+				else if (block == L"又名:") item = &info._alternates, readingInfoItem = true;
 			}
 		}
 

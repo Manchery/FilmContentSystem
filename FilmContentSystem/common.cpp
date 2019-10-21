@@ -20,7 +20,7 @@ int fast_read(char * s) {
 	char c = fast_getchar(); int len = -1;
 	if (c == EOF) return -1;
 	for (; c == ' ' || c == '\n' || c == '\r'; c = fast_getchar());
-	for (; c != ' ' && c != '\n' && c != '\r'; s[++len] = c, c = fast_getchar()); s[++len] = 0; return len;
+	for (; c != ' ' && c != '\n' && c != '\r' && c != EOF; s[++len] = c, c = fast_getchar()); s[++len] = 0; return len;
 }
 
 void fast_read(double & x) { // not support scientific notation

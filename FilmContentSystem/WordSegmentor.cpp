@@ -8,7 +8,7 @@ using std::max;
 
 WordSegmentor::WordSegmentor()
 {
-	hasHMM = false;
+	hasHMM = hasStopwords = false;
 	probEmit = new double[MAX_HAN_CODE][4];
 	logProb = nullptr; jump = nullptr;
 	vit = nullptr; optState = nullptr;
@@ -108,8 +108,28 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 	}
 }
 
-void WordSegmentor::loadStopwords(const char * stopwordsFile) // TODO
+void WordSegmentor::loadStopwords(const char * stopwordsFile)
 {
+	if (freopen(stopwordsFile, "r", stdin)) {
+		stopwords.reserve(1000);
+
+		const int MAXLEN = 100;
+		char cword[MAXLEN]; wchar_t word[MAXLEN];
+		int t;
+		while ((t = fast_read(cword)) != -1) {
+			mbstowcs(word, cword, MAXLEN);
+			stopwords[CharString(word)] = 1;
+		}
+		//freopen("CON", "r", stdin);
+		clear_buf();
+		fclose(stdin);
+
+		hasStopwords = true;
+	}
+	else {
+		std::cerr << "Stopwords file not found!" << std::endl;
+		hasStopwords = false;
+	}
 }
 
 void WordSegmentor::viterbi(const CharString & sentense)
@@ -205,7 +225,7 @@ void WordSegmentor::calcDAG(const CharString & sentense)
 	}
 }
 
-CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM)
+CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM, bool useStopwords)
 {
 	CharStringLink res;
 	CharString sentence;
@@ -223,6 +243,15 @@ CharStringLink WordSegmentor::cut(const CharString &passage, bool useHMM)
 		res.concat(hasHMM && useHMM ? cut_DAG_HMM(sentence) : cut_DAG(sentence));
 		sentence.clear();
 	}
+	return hasStopwords && useStopwords ? removeStopwords(res) : res;
+}
+
+CharStringLink WordSegmentor::removeStopwords(const CharStringLink & words)
+{
+	CharStringLink res;
+	for (auto it = words.begin(); it != words.end(); ++it)
+		if (!stopwords.find(*it))
+			res.push_back(*it);
 	return res;
 }
 
