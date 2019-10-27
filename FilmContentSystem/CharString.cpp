@@ -90,10 +90,10 @@ CharString CharString::substring(int l, int r) const {
 	return result;
 }
 
-int CharString::indexOf(const CharString & b) const	// KMP
+int CharString::indexOf(const CharString & b) const
 {
 	int blen = b.length();
-	int *next = new int[blen];
+	int *next = new int[blen];		// border 数组
 	next[0] = -1;
 	int k = -1;
 	for (int i = 1; i < blen; i++) {
@@ -136,6 +136,7 @@ CharString & CharString::operator=(const CharString & b)
 CharString & CharString::operator+=(const CharString & b)
 {
 	if (_len + b._len > _capacity) {
+		// 容量不足时，容量翻倍重新分配，该操作均摊复杂度 O(len(b))
 		int newCap = _capacity == 0 ? 1 : _capacity;
 		while (newCap < _len + b._len) newCap <<= 1;
 		reserve(newCap);
@@ -148,6 +149,7 @@ CharString & CharString::operator+=(const CharString & b)
 CharString & CharString::operator+=(wchar_t b)
 {
 	if (_len + 1 > _capacity) {
+		// 容量不足时，容量翻倍重新分配，该操作均摊复杂度 O(len(b))
 		int newCap = _capacity == 0 ? 1 : _capacity;
 		while (newCap < _len + 1) newCap <<= 1;
 		reserve(newCap);
