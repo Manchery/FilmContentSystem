@@ -88,6 +88,14 @@ bool isNumber(const CharString & str)
 	return true;
 }
 
+bool isSpaces(const CharString & str)
+{
+	for (int i = 0; i < str.length(); i++)
+		if (!iswspace(str[i]))
+			return false;
+	return true;
+}
+
 bool endsWith(const char * str, const char * end) {
 	int len1 = strlen(str), len2 = strlen(end);
 	return len1 >= len2 && strcmp(str + len1 - len2, end) == 0;

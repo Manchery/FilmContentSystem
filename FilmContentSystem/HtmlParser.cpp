@@ -13,7 +13,7 @@ HtmlReader::HtmlReader(const CharString & html) : html(html) {
 
 void HtmlReader::setHtml(const CharString & _html)
 {
-	html = _html;
+	html = _html; hp = 0;
 }
 
 bool HtmlReader::eof() const
@@ -80,6 +80,16 @@ void HtmlReader::skipBlock(wchar_t stopChar)
 		hp++;
 }
 
+CharString HtmlReader::readScript()
+{
+	// 保证script标签一定闭合，且闭合标签为 </script>
+	// TODO: maybe </ script>
+	CharString res;
+	while (!(html.substring(hp, hp + 9) == L"</script>"))
+		res += html[hp++];
+	return res;
+}
+
 
 static inline bool notName(wchar_t w) {
 	return !isDigit(w) && !isAlpha(w) && w != '-';
@@ -96,23 +106,36 @@ HtmlParser::~HtmlParser()
 {
 }
 
-void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isName, bool & isInfo, bool & isSummary)
+// 此时 reader 指向 '<'
+HtmlTag HtmlParser::readTag(TagState & closeState)
 {
 	closeState = OPEN;
+	reader.getChar(); // read '<'
+
+	if (reader.nextChar() == '!') {
+		closeState = COMMENT;
+		reader.skipBlock('>');
+		reader.getChar(); // read '>'
+		return HtmlTag();
+	}
+
 	if (reader.nextChar() == '/') closeState = CLOSED;
 	reader.skipBlock(isAlpha);
-	tagName = reader.getBlock(endOfTagName); isInfo = false; isSummary = false; isName = false;
-	if (tagName == L"title") isName = true;
+	CharString tagName = reader.getBlock(endOfTagName);
 	if (isSelfClosed(tagName)) closeState = SELFCLOSED;
+
+	HtmlTag tag(tagName);
 
 	while (true){ // reading attribute
 		CharString key, value;
+
 		wchar_t w;
 		do w = reader.getChar(); while (w != '>' && !isAlpha(w));
-		if (isAlpha(w)) reader.backSpace();
+		if (isAlpha(w)) 
+			reader.backSpace();
 		else if (w == '>') {
 			if (reader.prevChar() == '/') closeState = SELFCLOSED;
-			return;
+			return tag;
 		}
 
 		key = reader.getBlock(notName);
@@ -120,31 +143,25 @@ void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isN
 		if (w == '=') {
 			do w = reader.getChar(); while (w != '\'' && w != '\"');
 			value = reader.getBlock(w);
-			if (key == L"id" && value == L"info")
-				isInfo = true;
-			if (key == L"property" && value == L"v:summary")
-				isSummary = true;
-			if (key == L"class" && value == L"all hidden")
-				isSummary = true;
-			/*if (key == L"property" &&value == L"v:itemreviewed")
-				isName = true;*/
+			tag.addAttribute(key, value);
 		}
 		else if (isAlpha(w)) {
-			reader.backSpace(); continue;
+			reader.backSpace(); 
+			tag.addAttribute(key);
 		}
 		else if (w == '>') {
 			if (reader.prevChar() == '/') closeState = SELFCLOSED;
-			return;
+			return tag;
 		}
 	}
 }
 
-CharString HtmlParser::postProcessName(const CharString & name)
+CharString HtmlParser::postProcessTitle(const CharString & name)
 {
 	int l = 0, r = name.length()-1;
 	while (l <= r && iswspace(name[l])) l++;
 	while (l <= r && iswspace(name[r])) r--;
-	return name.substring(l, r + 1 - 4); // 4 for （豆瓣）
+	return name.substring(l, r + 1 - 5); // 5 for "_(豆瓣）"
 }
 
 CharString HtmlParser::postProcessSummary(const CharString & summary)
@@ -160,98 +177,93 @@ CharString HtmlParser::postProcessSummary(const CharString & summary)
 	return res;
 }
 
-void HtmlParser::postProcessInfo(const CharString & info, CharStringLink * item)
+void HtmlParser::postProcessInfoLine(const CharString & line, CharStringLink * item)
 {
-	int start = 0, len = info.length();
-	if (info[0] == ':') start++;
+	int start = 0, len = line.length();
+	while (line[start] != ':') start++; start++;
 	int last = start - 1;
 	for (int i = start; i <= len; i++) {
-		if (i == len || (i - 1 >= 0 && i + 1 < len && info[i - 1] == ' ' && info[i] == '/' && info[i + 1] == ' ')) {
+		if (i == len || (i - 1 >= 0 && i + 1 < len && line[i - 1] == ' ' && line[i] == '/' && line[i + 1] == ' ')) {
 			int l = last + 1, r = i - 1;
-			while (l <= r && iswspace(info[l])) l++;
-			while (l <= r && iswspace(info[r])) r--;
-			item->push_back(info.substring(l, r + 1));
+			while (l <= r && iswspace(line[l])) l++;
+			while (l <= r && iswspace(line[r])) r--;
+			item->push_back(line.substring(l, r + 1));
 			last = i + 1;
 		}
 	}
 }
 
+void HtmlParser::postProcessInfo(const CharString & content, FilmInfo & info)
+{
+	const int itemNum = 9;
+	const CharString lineStart[] = {
+		L"导演:",L"编剧:",L"主演:",L"类型:",L"制片国家/地区:",L"语言:",L"上映日期:",L"片长:",L"又名:"
+	};
+	CharStringLink *items[] = {
+		&info._directors, &info._screenwriters, &info._stars, &info._genres, &info._regions, &info._languages, &info._dates, &info._durations, &info._alternates
+	};
+	for (int i = 0; i < itemNum; i++) {
+		int start = content.indexOf(lineStart[i]);
+		if (start == -1) continue;
+		CharString tmp = content.substring(start, content.length());
+		int br = tmp.indexOf(L"<br>");
+		postProcessInfoLine(tmp.substring(0, br), items[i]);
+	}
+}
+
+void HtmlParser::postProcessTag(const HtmlTag & tag, FilmInfo & info)
+{
+	if (tag.type() == L"title") {
+		info.setName(postProcessTitle(tag.content()));
+	}
+	else if (tag.type() == L"div" && tag.hasAttribute(L"id", L"info")) {
+		postProcessInfo(tag.content(), info);
+	}
+	else if (tag.hasAttribute(L"property", L"v:summary") || tag.hasAttribute(L"class", L"all hidden")) {
+		info.setIntroduction(postProcessSummary(tag.content()));
+	}
+}
+
 FilmInfo HtmlParser::parse(const CharString & html)
 {
+	while (!tags.empty()) tags.pop();
 	reader.setHtml(html);
 	FilmInfo info;
-	bool readingInfo = false, readingSummary = false, readingName = false;
-	
-	CharString readed; bool readingInfoItem=false;
-	CharStringLink *item=nullptr;
 
 	while (!reader.eof()) {
-		if (!readingInfo && !readingSummary && !readingName)
-			reader.skipBlock('<');
-		else {
-			CharString block;
+		CharString block;
+		if (!tags.empty() && tags.top().type() == L"script")
+			block = reader.readScript();
+		else
 			block = reader.getBlock('<');
-			if (readingInfoItem || readingName || readingSummary)
-				readed += block;
-			else {
-				if (block == L"导演") item = &info._directors, readingInfoItem = true;
-				else if (block == L"编剧") item = &info._screenwriters, readingInfoItem = true;
-				else if (block == L"主演") item = &info._stars, readingInfoItem = true;
-				else if (block == L"类型:") item = &info._genres, readingInfoItem = true;
-				else if (block == L"制片国家/地区:") item = &info._regions, readingInfoItem = true;
-				else if (block == L"语言:") item = &info._languages, readingInfoItem = true;
-				else if (block == L"上映日期:") item = &info._dates, readingInfoItem = true;
-				else if (block == L"片长:") item = &info._durations, readingInfoItem = true;
-				else if (block == L"又名:") item = &info._alternates, readingInfoItem = true;
-			}
+		if (!isSpaces(block)) {
+			tags.top().pushContent(block);
 		}
 
-		reader.getChar(); // pass '<'
 		if (reader.eof()) break;
 
-		if (reader.nextChar() == '!') // 注释
-			reader.skipBlock('>'), reader.getChar();
-		else {
-			CharString tagName;
-			bool isInfo, isSummary, isName;
-			TagState closeState;
-			
-			readTag(tagName, closeState, isName, isInfo, isSummary);
+		TagState state;
+		HtmlTag currentTag = readTag(state), lastTop;
 
-			if (closeState == OPEN) {
-				tags.push(tagName);
-				if (isInfo) 
-					readingInfo = true, important = tags.size();
-				if (isSummary) 
-					readingSummary = true, important = tags.size();
-				if (isName)
-					readingName = true, important = tags.size();
+		switch (state)
+		{
+		case OPEN:
+			tags.push(currentTag);
+			break;
+		case CLOSED:
+			do {
+				lastTop = tags.top(); tags.pop();
+				if (!tags.empty()) tags.top().pushContent(lastTop.content());
+			} while (!(lastTop.type()==currentTag.type()));
+			postProcessTag(lastTop, info);
+			break;
+		case SELFCLOSED:
+			if (currentTag.type() == L"br") {
+				tags.top().pushContent(L"<br>");
 			}
-			else if (closeState == CLOSED) {
-				while (!(tags.top() == tagName)) tags.pop();  // 未正确关闭的标签
-				tags.pop();
-				if (tags.size() < important) {
-					if (readingName) {
-						info.setName(postProcessName(readed));
-						readed.clear();
-					}
-					if (readingSummary) {
-						info.setIntroduction(postProcessSummary(readed));
-						readed.clear();
-					}
-					important = -1, readingInfo = readingSummary = readingName = false;
-				}
-			}
-			else if (closeState == SELFCLOSED) {
-				if (readingInfoItem && tagName == L"br") {
-					postProcessInfo(readed, item);
-					readingInfoItem = false;
-					readed.clear();
-				}
-				if (readingSummary && tagName == L"br") {
-					readed += L"<br>";
-				}
-			}
+			break;
+		case COMMENT:
+			break;
 		}
 	}
 

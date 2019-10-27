@@ -128,7 +128,9 @@
     <ClInclude Include="FilmInfo.h" />
     <ClInclude Include="HashMap.hpp" />
     <ClInclude Include="HtmlParser.h" />
+    <ClInclude Include="HtmlTag.h" />
     <ClInclude Include="Stack.hpp" />
+    <ClInclude Include="Vector.hpp" />
     <ClInclude Include="WordSegmentor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +141,7 @@
     <ClCompile Include="FilmContentSystemMain.cpp" />
     <ClCompile Include="FilmInfo.cpp" />
     <ClCompile Include="HtmlParser.cpp" />
+    <ClCompile Include="HtmlTag.cpp" />
     <ClCompile Include="WordSegmentor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

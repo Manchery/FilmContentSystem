@@ -9,6 +9,7 @@ class TagAttribute {
 private:
 	CharString _key, _value;
 public:
+	TagAttribute() { }
 	TagAttribute(const CharString &key, const CharString &value) :_key(key), _value(value) { }
 	TagAttribute(const CharString &key):_key(key),_value() { }
 	const CharString &key() const { return _key; }
@@ -21,6 +22,7 @@ class HtmlTag
 	Vector<TagAttribute> _attr;
 	CharString _content;
 public:
+	HtmlTag();
 	HtmlTag(const CharString &type);
 	~HtmlTag();
 	const CharString &type() const { return _type; }
@@ -29,5 +31,8 @@ public:
 	void addAttribute(const CharString &key);
 	void addAttribute(const CharString &key, const CharString &value);
 	void pushContent(const CharString &content);
+
+	bool hasAttribute(const CharString &key) const;
+	bool hasAttribute(const CharString &key, const CharString &value) const;
 };
 

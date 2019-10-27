@@ -4,11 +4,14 @@
 #include <cstring>
 #include <locale>
 #include <codecvt>
+#include <ctime>
 
 using namespace std;
 
 void _main() {
+	auto start = clock();
 	FilmContentSystemApplication().run();
+	std::cerr << std::endl << "Totally times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 }
 
 void _debug(const char *dictFile, const char *hmmFile, const char* stopwordsFile, const char *inputFile, const char *infoFile, const char *txtFile) {
@@ -35,7 +38,7 @@ int main() {
 	/*_debug("C:\\Users\\Manchery\\Desktop\\实验1材料\\dict\\dict.txt",
 		"C:\\Users\\Manchery\\Desktop\\实验1材料\\dict\\HMM.txt",
 		"C:\\Users\\Manchery\\Desktop\\实验1材料\\dict\\stopwords.txt",
-		"C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\19.html",
+		"C:\\Users\\Manchery\\Desktop\\实验1材料\\input\\605.html",
 		"C:\\Users\\Manchery\\Desktop\\output.info",
 		"C:\\Users\\Manchery\\Desktop\\output.txt");*/
 	_main();

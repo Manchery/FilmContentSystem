@@ -48,6 +48,12 @@
     <ClInclude Include="common.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Vector.hpp">
+      <Filter>头文件\数据结构</Filter>
+    </ClInclude>
+    <ClInclude Include="HtmlTag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FilmContentSystemMain.cpp">
@@ -72,6 +78,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HtmlTag.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

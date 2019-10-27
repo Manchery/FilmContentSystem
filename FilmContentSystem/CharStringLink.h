@@ -44,6 +44,7 @@ public:
 	void remove(node *x);
 	void remove(const CharString &s);
 	void concat(const CharStringLink &b);
+	bool empty() const { return head == nullptr; }
 
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };

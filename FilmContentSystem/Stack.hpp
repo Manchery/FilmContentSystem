@@ -23,6 +23,27 @@ public:
 		_top = -1; _capacity = initCap;
 		_stack = new value_t[initCap];
 	}
+	Stack(const Stack &b) {
+		_capacity = b.size(); _top = _capacity - 1;
+		_stack = new value_t[_capacity];
+		for (int i = 0; i <= _top; i++)
+			_stack[i] = b._stack[i];
+	}
+	Stack& operator=(const Stack &b) {
+		if (_capacity < b.size()) {
+			delete[] _stack;
+			_capacity = b.size(); _top = _capacity - 1;
+			_stack = new value_t[_capacity];
+			for (int i = 0; i <= _top; i++)
+				_stack[i] = b._stack[i];
+		}
+		else {
+			_top = b._top;
+			for (int i = 0; i <= _top; i++)
+				_stack[i] = b[i];
+		}
+		return *this;
+	}
 	~Stack() {
 		delete[] _stack;
 	}
@@ -47,7 +68,7 @@ public:
 			throw std::logic_error("The stack is empty!");
 		--_top;
 	}
-	value_t top() const {
+	value_t &top() const {
 		if (empty())
 			throw std::logic_error("The stack is empty!");
 		return _stack[_top];

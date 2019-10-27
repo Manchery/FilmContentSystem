@@ -39,7 +39,7 @@ public:
 	CharString& operator+=(const CharString &b);
 	CharString& operator+=(wchar_t b);
 
-	int indexOf(CharString &b) const; // TODO: unit test
+	int indexOf(const CharString &b) const; // TODO: unit test
 
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
 	friend std::wostream & operator << (std::wostream & os, const CharString &str);

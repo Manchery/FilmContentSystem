@@ -90,7 +90,7 @@ CharString CharString::substring(int l, int r) const {
 	return result;
 }
 
-int CharString::indexOf(CharString & b) const	// KMP
+int CharString::indexOf(const CharString & b) const	// KMP
 {
 	int blen = b.length();
 	int *next = new int[blen];
@@ -107,7 +107,7 @@ int CharString::indexOf(CharString & b) const	// KMP
 		while (~k && b[k + 1] != _str[i]) k = next[k];
 		if (b[k + 1] == _str[i]) k++;
 		if (k == blen - 1) {
-			ans = i - k + 1; break;
+			ans = i - k; break;
 		}
 	}
 	delete[] next;

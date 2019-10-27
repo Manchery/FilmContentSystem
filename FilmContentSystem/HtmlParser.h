@@ -25,24 +25,28 @@ public:
 	CharString getBlock(wchar_t stopChar);
 	void skipBlock(bool stopChar(wchar_t));
 	void skipBlock(wchar_t stopChar);
+
+	CharString readScript();
 };
 
 enum TagState {
-	OPEN, CLOSED,SELFCLOSED 
+	OPEN, CLOSED,SELFCLOSED, COMMENT
 };
 
 class HtmlParser
 {
 private:
 	HtmlReader reader;
-	Stack<CharString> tags;
-	int important; // TODO: rename
+	Stack<HtmlTag> tags;
 
-	void readTag(CharString &tagName, TagState &closeState, bool & isName, bool &isInfo, bool &isSummary);
+	HtmlTag readTag(TagState & closeState);
 
-	CharString postProcessName(const CharString &name);
+	CharString postProcessTitle(const CharString &name);
 	CharString postProcessSummary(const CharString &summary);
-	void postProcessInfo(const CharString &info, CharStringLink *item);
+	void postProcessInfoLine(const CharString &line, CharStringLink *item);
+	void postProcessInfo(const CharString &content, FilmInfo &info);
+	void postProcessTag(const HtmlTag& tag, FilmInfo &info);
+
 public:
 	HtmlParser();
 	~HtmlParser();

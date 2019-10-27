@@ -15,15 +15,36 @@ private:
 	value_t *_vector;
 	int _size, _capacity;
 public:
-	Stack() {
+	Vector() {
 		_size = 0; _capacity = 0;
 		_vector = nullptr;
 	}
-	Stack(int initCap) {
+	Vector(int initCap) {
 		_size = 0; _capacity = initCap;
 		_vector = new value_t[initCap];
 	}
-	~Stack() {
+	Vector(const Vector &b) {
+		_size = _capacity = b.size();
+		_vector = new value_t[_capacity];
+		for (int i = 0; i < _size; i++)
+			_vector[i] = b[i];
+	}
+	Vector& operator=(const Vector &b) {
+		if (_capacity < b._size) {
+			delete[] _vector;
+			_size = _capacity = b.size();
+			_vector = new value_t[_capacity];
+			for (int i = 0; i < _size; i++)
+				_vector[i] = b[i];
+		}
+		else {
+			_size = b._size;
+			for (int i = 0; i < _size; i++)
+				_vector[i] = b[i];
+		}
+		return *this;
+	}
+	~Vector() {
 		delete[] _vector;
 	}
 	int size() const { return _size; }
@@ -57,8 +78,20 @@ public:
 			throw std::logic_error("The vector is empty!");
 		return _vector[0];
 	}
+	value_t &operator[](int x) {
+		return _vector[x];
+	}
+	const value_t &operator[](int x) const {
+		return _vector[x];
+	}
+	const value_t &at(int x) const {
+		if (x < 0 || x >= _size)
+			throw std::out_of_range("Index of vector out of range!");
+		return _vector[x];
+	}
 	bool empty() const {
 		return _size == 0;
 	}
+	
 };
 
