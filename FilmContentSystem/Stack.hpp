@@ -19,12 +19,16 @@ public:
 		_top = -1; _capacity = 0;
 		_stack = nullptr;
 	}
+	Stack(int initCap) {
+		_top = -1; _capacity = initCap;
+		_stack = new value_t[initCap];
+	}
 	~Stack() {
 		delete[] _stack;
 	}
 	int size() const { return _top + 1; }
 	int capacity() const { return _capacity; }
-	void reserse(int cap) {
+	void reserve(int cap) {
 		if (_capacity < cap) {
 			iterator newStack = new value_t[cap];
 			for (int i = 0; i <= _top; i++) newStack[i] = _stack[i];
@@ -34,7 +38,7 @@ public:
 	}
 	void push(const value_t & item) {
 		if (_capacity == 0 || _top == _capacity - 1) {
-			reserse(_capacity == 0 ? 1 : _capacity * 2);
+			reserve(_capacity == 0 ? 1 : _capacity * 2);
 		}
 		_stack[++_top] = item;
 	}

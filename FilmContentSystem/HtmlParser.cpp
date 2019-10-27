@@ -3,58 +3,83 @@
 #include <cctype>
 
 
-wchar_t HtmlParser::prevChar()
+HtmlReader::HtmlReader()
 {
-	if (hp >= 2) return _html[hp - 2];
+}
+
+HtmlReader::HtmlReader(const CharString & html) : html(html) {
+	hp = 0;
+}
+
+void HtmlReader::setHtml(const CharString & _html)
+{
+	html = _html;
+}
+
+bool HtmlReader::eof() const
+{
+	return hp >= html.length();
+}
+
+wchar_t HtmlReader::prevChar() const
+{
+	if (hp >= 2) return html[hp - 2];
 	throw std::out_of_range("The previous out of range!");
 }
 
-wchar_t HtmlParser::nextChar()
+wchar_t HtmlReader::nextChar() const
 {
-	if (hp < _html.length()) return _html[hp];
+	if (hp < html.length()) return html[hp];
 	throw std::out_of_range("The next out of range");
 }
 
-wchar_t HtmlParser::getChar() {
-	if (hp >= _html.length()) return EOF;
-	return _html[hp++];
-}
-
-CharString HtmlParser::getBlock(bool stopChar(wchar_t)) {
-	if (hp >= _html.length()) return CharString();
-	CharString res;
-	while (hp < _html.length() && !stopChar(_html[hp]))
-		res += _html[hp++];
-	return res;
-}
-
-CharString HtmlParser::getBlock(wchar_t stopWord)
+wchar_t HtmlReader::curChar() const
 {
-	if (hp >= _html.length()) return CharString();
-	CharString res;
-	while (hp < _html.length() && _html[hp]!=stopWord)
-		res += _html[hp++];
-	return res;
+	if (hp >= html.length()) return EOF;
+	return html[hp];
 }
 
-void HtmlParser::skipBlock(bool stopChar(wchar_t))
-{
-	if (hp >= _html.length()) return;
-	while (hp < _html.length() && !stopChar(_html[hp]))
-		hp++;
+wchar_t HtmlReader::getChar() {
+	if (hp >= html.length()) return EOF;
+	return html[hp++];
 }
 
-void HtmlParser::skipBlock(wchar_t stopWord)
-{
-	if (hp >= _html.length()) return;
-	while (hp < _html.length() && _html[hp]!=stopWord)
-		hp++;
-}
-
-void HtmlParser::backSpace()
+void HtmlReader::backSpace()
 {
 	if (hp > 0) hp--;
 }
+
+CharString HtmlReader::getBlock(bool stopChar(wchar_t)) {
+	if (hp >= html.length()) return CharString();
+	CharString res;
+	while (hp < html.length() && !stopChar(html[hp]))
+		res += html[hp++];
+	return res;
+}
+
+CharString HtmlReader::getBlock(wchar_t stopChar)
+{
+	if (hp >= html.length()) return CharString();
+	CharString res;
+	while (hp < html.length() && html[hp]!= stopChar)
+		res += html[hp++];
+	return res;
+}
+
+void HtmlReader::skipBlock(bool stopChar(wchar_t))
+{
+	if (hp >= html.length()) return;
+	while (hp < html.length() && !stopChar(html[hp]))
+		hp++;
+}
+
+void HtmlReader::skipBlock(wchar_t stopChar)
+{
+	if (hp >= html.length()) return;
+	while (hp < html.length() && html[hp]!= stopChar)
+		hp++;
+}
+
 
 static inline bool notName(wchar_t w) {
 	return !isDigit(w) && !isAlpha(w) && w != '-';
@@ -74,27 +99,27 @@ HtmlParser::~HtmlParser()
 void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isName, bool & isInfo, bool & isSummary)
 {
 	closeState = OPEN;
-	if (nextChar() == '/') closeState = CLOSED;
-	skipBlock(isAlpha);
-	tagName = getBlock(endOfTagName); isInfo = false; isSummary = false; isName = false;
+	if (reader.nextChar() == '/') closeState = CLOSED;
+	reader.skipBlock(isAlpha);
+	tagName = reader.getBlock(endOfTagName); isInfo = false; isSummary = false; isName = false;
 	if (tagName == L"title") isName = true;
 	if (isSelfClosed(tagName)) closeState = SELFCLOSED;
 
 	while (true){ // reading attribute
 		CharString key, value;
 		wchar_t w;
-		do w = getChar(); while (w != '>' && !isAlpha(w));
-		if (isAlpha(w)) backSpace();
+		do w = reader.getChar(); while (w != '>' && !isAlpha(w));
+		if (isAlpha(w)) reader.backSpace();
 		else if (w == '>') {
-			if (prevChar() == '/') closeState = SELFCLOSED;
+			if (reader.prevChar() == '/') closeState = SELFCLOSED;
 			return;
 		}
 
-		key = getBlock(notName);
-		do w = getChar(); while (w != '=' && w != '>' && !isAlpha(w));
+		key = reader.getBlock(notName);
+		do w = reader.getChar(); while (w != '=' && w != '>' && !isAlpha(w));
 		if (w == '=') {
-			do w = getChar(); while (w != '\'' && w != '\"');
-			value = getBlock(w);
+			do w = reader.getChar(); while (w != '\'' && w != '\"');
+			value = reader.getBlock(w);
 			if (key == L"id" && value == L"info")
 				isInfo = true;
 			if (key == L"property" && value == L"v:summary")
@@ -105,10 +130,10 @@ void HtmlParser::readTag(CharString & tagName, TagState & closeState, bool & isN
 				isName = true;*/
 		}
 		else if (isAlpha(w)) {
-			backSpace(); continue;
+			reader.backSpace(); continue;
 		}
 		else if (w == '>') {
-			if (prevChar() == '/') closeState = SELFCLOSED;
+			if (reader.prevChar() == '/') closeState = SELFCLOSED;
 			return;
 		}
 	}
@@ -151,21 +176,21 @@ void HtmlParser::postProcessInfo(const CharString & info, CharStringLink * item)
 	}
 }
 
-FilmInfo HtmlParser::parse(const CharString & __html)
+FilmInfo HtmlParser::parse(const CharString & html)
 {
+	reader.setHtml(html);
 	FilmInfo info;
-	_html = __html; hp = 0; 
 	bool readingInfo = false, readingSummary = false, readingName = false;
 	
 	CharString readed; bool readingInfoItem=false;
 	CharStringLink *item=nullptr;
 
-	while (hp < _html.length()) {
+	while (!reader.eof()) {
 		if (!readingInfo && !readingSummary && !readingName)
-			skipBlock('<');
+			reader.skipBlock('<');
 		else {
 			CharString block;
-			block = getBlock('<');
+			block = reader.getBlock('<');
 			if (readingInfoItem || readingName || readingSummary)
 				readed += block;
 			else {
@@ -181,11 +206,11 @@ FilmInfo HtmlParser::parse(const CharString & __html)
 			}
 		}
 
-		getChar(); // pass '<'
-		if (hp == _html.length()) break;
+		reader.getChar(); // pass '<'
+		if (reader.eof()) break;
 
-		if (nextChar() == '!') // ×¢ÊÍ
-			skipBlock('>'), getChar();
+		if (reader.nextChar() == '!') // ×¢ÊÍ
+			reader.skipBlock('>'), reader.getChar();
 		else {
 			CharString tagName;
 			bool isInfo, isSummary, isName;
