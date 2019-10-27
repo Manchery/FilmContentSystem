@@ -67,13 +67,12 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 	}
 }
 
-void FilmContentSystemApplication::run()
+void FilmContentSystemApplication::run(const char * configFile)
 {
-#ifdef _DEBUG
-	loadConfig("../Debug/FilmContentSystem.config");
-#else
-	loadConfig(CONFIG_PATH);
-#endif
+	if (configFile != nullptr)
+		loadConfig(configFile);
+	else
+		loadConfig(DEFAULT_CONFIG_PATH);
 
 	_mkdir(outputDir);
 
@@ -87,6 +86,7 @@ void FilmContentSystemApplication::run()
 		std::cerr << inputDir << " not found!" << std::endl;
 	}
 	else {
+		// 遍历输入目录下所有html文件
 		while (_findnext(lf, &file) == 0) {
 			if (strcmp(file.name, ".") == 0 || strcmp(file.name, "..") == 0)
 				continue;
@@ -106,6 +106,7 @@ void FilmContentSystemApplication::run()
 
 			/*------------------------------------------------------------------------------------*/
 
+			// 解析 html
 			auto info = extractInfo(filePath);
 
 			std::wofstream wfout(infoFile);
@@ -115,6 +116,7 @@ void FilmContentSystemApplication::run()
 
 			wfout.open(txtFile);
 			wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+			// 中文分词
 			CharStringLink cuts = divideWords(info.introduction(), useHMM, useStopwords);
 			for (auto it = cuts.begin(); it != cuts.end(); ++it) {
 				wfout << *it << std::endl;
@@ -170,5 +172,5 @@ CharStringLink FilmContentSystemApplication::divideWords(const CharString & pass
 
 	return res;
 
-	//return segmentor.cut(passage);
+	//return segmentor.cut(passage, useHMM, useStopwords);
 }
