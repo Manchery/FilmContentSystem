@@ -59,7 +59,7 @@ bool read_bool_flag()
 	return false;
 }
 
-// Ref: https://stackoverflow.com/questions/4775437/read-unicode-utf-8-file-into-wstring
+// Reference: https://stackoverflow.com/questions/4775437/read-unicode-utf-8-file-into-wstring
 std::wstring read_utf8_file(const char * filename)
 {
 	std::wifstream wif(filename);
