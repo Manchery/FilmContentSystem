@@ -20,14 +20,14 @@ class FileReader
 {
 private:
 	char *buf, *p1, *p2;
-	FILE* file;
+	FILE* file; errno_t err;
 public:
 	FileReader();
 	FileReader(const char *filename);
 	~FileReader();
 
 	// 文件是否打开成功
-	bool bad() const { return file == NULL; }
+	bool bad() const { return err; }
 	void set_file(const char *filename);
 
 	// 通过 fread 从file读取一片缓存，实现比标准的getchar更快的读入

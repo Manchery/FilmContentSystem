@@ -5,25 +5,26 @@ FileReader::FileReader()
 {
 	buf = new char[BUF_SIZE];
 	p1 = p2 = buf;
-	file = nullptr;
+	file = NULL;
 }
 
 FileReader::FileReader(const char * filename)
 {
 	buf = new char[BUF_SIZE];
 	p1 = p2 = buf;
-	file = fopen(filename, "r");
+	err = fopen_s(&file, filename, "r");
 }
 
 FileReader::~FileReader()
 {
-	fclose(file);
+	if (file) fclose(file);
 	delete buf;
 }
 
 void FileReader::set_file(const char * filename)
 {
-	fclose(file); file = fopen(filename, "r");
+	if (file) fclose(file); 
+	err = fopen_s(&file, filename, "r");
 	clear_buf();
 }
 
@@ -80,7 +81,8 @@ bool FileReader::read_bool_flag()
 {
 	char value[100];
 	read(value);
-	if (strcmp(_strlwr(value), "true") == 0) return true;
+	_strlwr_s(value, strlen(value) + 1);
+	if (strcmp(value, "true") == 0) return true;
 	return false;
 }
 

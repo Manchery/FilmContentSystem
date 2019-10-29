@@ -50,12 +50,11 @@ public:
 
 	void run(const char *configFile = nullptr);
 
-	// 读取 config，要求config文件采用 ANSI 编码
-	// TODO: config 文件采用 utf-8 编码
+	// 读取 config，要求config文件采用 UTF-8 编码
 	void loadConfig(const char *configFile);
 
 	// 读取字典、HMM参数、停用词典
-	void initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);
+	bool initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);
 	// 解析Html
 	FilmInfo extractInfo(const char *htmlFile);
 	// 中文分词

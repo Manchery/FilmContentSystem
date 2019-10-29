@@ -45,7 +45,7 @@ int WordSegmentor::state2Idx(char s)
 template<typename T1, typename T2>
 constexpr auto Max(T1 a, T2 b) { return ((a)>(b)?(a):(b)); }
 
-void WordSegmentor::loadDict(const char * dictFile)
+bool WordSegmentor::loadDict(const char * dictFile)
 {
 	FileReader f(dictFile);
 	if (!f.bad()) {
@@ -67,9 +67,11 @@ void WordSegmentor::loadDict(const char * dictFile)
 			if (toConcatNumerals && strcmp(POS, "m") == 0)
 				numeralFreq[word[wcslen(word) - 1]]++;
 		}
+		return true;
 	}
 	else {
-		throw std::runtime_error("Dictionary file not found!");
+		std::cerr << "Dictionary file not found!" << std::endl;
+		return false;
 	}
 }
 

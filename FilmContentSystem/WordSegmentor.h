@@ -67,8 +67,8 @@ public:
 	WordSegmentor();
 	~WordSegmentor();
 
-	// 为了优化读入速度，要求 dictFile，hmmFile，stopwordsFile 都为 ANSI 编码
-	void loadDict(const char *dictFile);
+	// 要求 dictFile，hmmFile，stopwordsFile 都为 UTF-8 编码
+	bool loadDict(const char *dictFile);
 	void loadHMM(const char *hmmFile);
 	void loadStopwords(const char *stopwordsFile);
 	

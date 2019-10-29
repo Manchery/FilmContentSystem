@@ -33,14 +33,14 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 				f.read_string_flag(inputDir);
 				filePathCvtCode(inputDir);
 				if (!endsWith(inputDir, "/")) 
-					strcat(inputDir, "/");
+					strcat_s(inputDir, "/");
 			}
 			else if (strcmp(flag, "OUTPUT_DIR") == 0) {
 				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(outputDir);
 				filePathCvtCode(outputDir);
 				if (!endsWith(outputDir, "/")) 
-					strcat(outputDir, "/");
+					strcat_s(outputDir, "/");
 			}
 			else if (strcmp(flag, "DICT_PATH") == 0) {
 				if (nextChar != '=') while (f.nextchar() != '=');
@@ -87,12 +87,12 @@ void FilmContentSystemApplication::run(const char * configFile)
 
 	_mkdir(outputDir);
 
-	initDictionary(dictFile, hmmFile, stopwordsFile);
+	if (!initDictionary(dictFile, hmmFile, stopwordsFile)) return;
 
 	_finddata_t file;
 	long lf; const int MAX_FILE_NAME_LEN = 1000;
 	char inputReg[MAX_FILE_NAME_LEN] = { 0 };
-	strcat(strcat(inputReg, inputDir), "*");
+	strcat_s(inputReg, inputDir); strcat_s(inputReg, "*");
 	if ((lf = _findfirst(inputReg, &file)) == -1) {
 		std::cerr << inputDir << " not found!" << std::endl;
 	}
@@ -107,13 +107,13 @@ void FilmContentSystemApplication::run(const char * configFile)
 			std::cerr << "Found " << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
-			strncpy(baseName, file.name, strlen(file.name) - 5);
+			strncpy_s(baseName, file.name, strlen(file.name) - 5);
 			char filePath[MAX_FILE_NAME_LEN] = { 0 };
-			strcat(strcat(filePath, inputDir), file.name);
+			strcat_s(filePath, inputDir); strcat_s(filePath, file.name);
 			char infoFile[MAX_FILE_NAME_LEN] = { 0 };
-			strcat(strcat(strcat(infoFile, outputDir), baseName), ".info");
+			strcat_s(infoFile, outputDir); strcat_s(infoFile, baseName); strcat_s(infoFile, ".info");
 			char txtFile[MAX_FILE_NAME_LEN] = { 0 };
-			strcat(strcat(strcat(txtFile, outputDir), baseName), ".txt");
+			strcat_s(txtFile, outputDir); strcat_s(txtFile, baseName); strcat_s(txtFile, ".txt");
 
 			/*------------------------------------------------------------------------------------*/
 
@@ -140,10 +140,11 @@ void FilmContentSystemApplication::run(const char * configFile)
 	_findclose(lf);
 }
 
-void FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
+bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
 {
 	auto start = clock();
-	segmentor.loadDict(dictFile);
+	if (!segmentor.loadDict(dictFile))
+		return false;
 	std::cerr << "Loading Dictionary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 
 	if (hmmFile) {
@@ -157,6 +158,7 @@ void FilmContentSystemApplication::initDictionary(const char * dictFile, const c
 		segmentor.loadStopwords(stopwordsFile);
 		std::cerr << "Loading Stopwords times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	}
+	return true;
 }
 
 FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
