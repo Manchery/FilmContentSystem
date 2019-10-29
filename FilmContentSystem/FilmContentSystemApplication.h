@@ -18,7 +18,7 @@ const char DEFAULT_STOP_PATH[] = "dict/stopwords.txt";
 const bool DEFAULT_USE_HMM = true;
 const bool DEFAULT_USE_STOP = false;
 
-const int MAX_FLAG_LEN = 100;	// config中flag的最大长度
+const int MAX_FLAG_LEN = 500;	// config中flag的最大长度
 
 /*-------------------------END: 默认的config-------------------------*/
 

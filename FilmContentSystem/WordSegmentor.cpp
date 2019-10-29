@@ -1,10 +1,11 @@
 #include "WordSegmentor.h"
 #include "common.h"
+#include "FileReader.h"
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <algorithm>
-using std::max;
+#include <windows.h>
 
 WordSegmentor::WordSegmentor()
 {
@@ -41,29 +42,31 @@ int WordSegmentor::state2Idx(char s)
 	}
 }
 
+template<typename T1, typename T2>
+constexpr auto Max(T1 a, T2 b) { return ((a)>(b)?(a):(b)); }
+
 void WordSegmentor::loadDict(const char * dictFile)
 {
-	if (freopen(dictFile, "r", stdin)) {
+	FileReader f(dictFile);
+	if (!f.bad()) {
 		dict.reserve(350000); 
 		numWords = 0; totalFreq = 0; maxWordLen = 0;
 
 		const int MAXLEN = 100;
 		char cword[MAXLEN], POS[MAXLEN]; int freq; wchar_t word[MAXLEN];
 		int t;
-		while ((t = fast_read(cword)) != -1) {
-			fast_read(freq); fast_read(POS);
-			mbstowcs(word, cword, MAXLEN);
+		while ((t = f.read(cword)) != -1) {
+			f.read(freq); f.read(POS);
+			//mbstowcs(word, cword, MAXLEN);
+			MultiByteToWideChar(CP_UTF8, 0, cword, -1, word, MAXLEN);
 
-			++numWords; totalFreq += freq; maxWordLen = std::max(maxWordLen, (int)wcslen(word));
+			++numWords; totalFreq += freq; maxWordLen = Max(maxWordLen, (int)wcslen(word));
 			dict[word] = freq;
 
 			// numeralFreq: 记录每个字作为量词结尾的出现次数，用于判断某一词是否为量词
 			if (toConcatNumerals && strcmp(POS, "m") == 0)
 				numeralFreq[word[wcslen(word) - 1]]++;
 		}
-		//freopen("CON", "r", stdin);
-		clear_buf();
-		fclose(stdin);
 	}
 	else {
 		throw std::runtime_error("Dictionary file not found!");
@@ -72,7 +75,8 @@ void WordSegmentor::loadDict(const char * dictFile)
 
 void WordSegmentor::loadHMM(const char * hmmFile)
 {
-	if (freopen(hmmFile, "r", stdin)) {
+	FileReader f(hmmFile);
+	if (!f.bad()) {
 		for (int i = 0; i < 4; i++) probStart[i] = -3.14e+100;
 		for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) probTrans[i][j] = -3.14e+100;
 		for (int i = 0; i < MAX_HAN_CODE; i++) for (int j = 0; j < 4; j++) probEmit[i][j] = -3.14e+100;
@@ -81,9 +85,9 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 		bool readingStart = false, readingTrans = false, readingEmit = false;
 		int emitState;
 
-		while (fast_read(s) != -1) {
+		while (f.read(s) != -1) {
 			if (strcmp(s, "#") == 0) {
-				fast_read(s);
+				f.read(s);
 				if (strcmp(s, "prob_start") == 0) readingStart = true;
 				else if (strcmp(s, "prob_trans") == 0) readingTrans = true;
 				else if (strcmp(s, "prob_emit_B") == 0) readingEmit = true, emitState = 0;
@@ -95,23 +99,22 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 			else {
 				double p;
 				if (readingEmit) {
-					wchar_t word[5]; mbstowcs(word, s, 100);
-					fast_read(p);
+					wchar_t word[5]; 
+					// mbstowcs(word, s, 100);
+					MultiByteToWideChar(CP_UTF8, 0, s, -1, word, 5);
+					f.read(p);
 					probEmit[(int)word[0]][emitState] = p;
 				}
 				else if (readingStart) {
-					fast_read(p);
+					f.read(p);
 					probStart[state2Idx(s[0])] = p;
 				}
 				else if (readingTrans) {
-					char s2[5]; fast_read(s2); fast_read(p);
+					char s2[5]; f.read(s2); f.read(p);
 					probTrans[state2Idx(s[0])][state2Idx(s2[0])] = p;
 				}
 			}
 		}
-		//freopen("CON", "r", stdin);
-		clear_buf();
-		fclose(stdin);
 
 		hasHMM = true;
 	}
@@ -123,19 +126,18 @@ void WordSegmentor::loadHMM(const char * hmmFile)
 
 void WordSegmentor::loadStopwords(const char * stopwordsFile)
 {
-	if (freopen(stopwordsFile, "r", stdin)) {
+	FileReader f(stopwordsFile);
+	if (!f.bad()) {
 		stopwords.reserve(1000);
 
 		const int MAXLEN = 100;
 		char cword[MAXLEN]; wchar_t word[MAXLEN];
 		int t;
-		while ((t = fast_read(cword)) != -1) {
-			mbstowcs(word, cword, MAXLEN);
+		while ((t = f.read(cword)) != -1) {
+			//mbstowcs(word, cword, MAXLEN);
+			MultiByteToWideChar(CP_UTF8, 0, cword, -1, word, MAXLEN);
 			stopwords[CharString(word)] = 1;
 		}
-		//freopen("CON", "r", stdin);
-		clear_buf();
-		fclose(stdin);
 
 		hasStopwords = true;
 	}
@@ -157,7 +159,7 @@ void WordSegmentor::viterbi(const CharString & sentense)
 		for (int j = 0; j < 4; j++) {
 			vit[i][j] = -3.14e+100;
 			for (int k = 0; k < 4; k++) {
-				vit[i][j] = max(vit[i][j], vit[i - 1][k] + probTrans[k][j]);
+				vit[i][j] = Max(vit[i][j], vit[i - 1][k] + probTrans[k][j]);
 			}
 			vit[i][j] += probEmit[(int)sentense[i]][j];
 		}

@@ -1,58 +1,69 @@
 #include "FilmContentSystemApplication.h"
+#include "FileReader.h"
 #include "common.h"
 #include <ctime>
 #include <iostream>
 #include <direct.h>
 #include <io.h>
 
-
 FilmContentSystemApplication::FilmContentSystemApplication()
 {
 	useHMM = useStopwords = false;
 }
 
-
 FilmContentSystemApplication::~FilmContentSystemApplication()
 {
 }
 
+// 将文件路径转化为 ANSI 编码
+static void filePathCvtCode(char *filepath) {
+	wchar_t tmp[MAX_FLAG_LEN];
+	MultiByteToWideChar(CP_UTF8, 0, filepath, -1, tmp, MAX_FLAG_LEN);
+	WideCharToMultiByte(CP_ACP, 0, tmp, -1, filepath, MAX_FLAG_LEN, NULL, 0);
+}
+
 void FilmContentSystemApplication::loadConfig(const char * configFile)
 {
-	if (freopen(configFile, "r", stdin)) {
-		const int MAX_LEN = 100;
-		char flag[MAX_LEN], nextChar;
-		while (read_flag_name(flag, nextChar) != -1) {
+	FileReader f(configFile);
+	if (!f.bad()) {
+		char flag[MAX_FLAG_LEN], nextChar;
+		while (f.read_flag_name(flag, nextChar) != -1) {
 			if (strcmp(flag, "INPUT_DIR") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				read_string_flag(inputDir);
+				if (nextChar != '=') while (f.nextchar() != '=');
+				f.read_string_flag(inputDir);
+				filePathCvtCode(inputDir);
 				if (!endsWith(inputDir, "/")) 
 					strcat(inputDir, "/");
 			}
 			else if (strcmp(flag, "OUTPUT_DIR") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				read_string_flag(outputDir);
+				if (nextChar != '=') while (f.nextchar() != '=');
+				f.read_string_flag(outputDir);
+				filePathCvtCode(outputDir);
 				if (!endsWith(outputDir, "/")) 
 					strcat(outputDir, "/");
 			}
 			else if (strcmp(flag, "DICT_PATH") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				read_string_flag(dictFile);
+				if (nextChar != '=') while (f.nextchar() != '=');
+				f.read_string_flag(dictFile);
+				filePathCvtCode(dictFile);
 			}
 			else if (strcmp(flag, "HMM_PATH") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				read_string_flag(hmmFile);
+				if (nextChar != '=') while (f.nextchar() != '=');
+				f.read_string_flag(hmmFile);
+				filePathCvtCode(hmmFile);
 			}
 			else if (strcmp(flag, "STOP_PATH") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				read_string_flag(stopwordsFile);
+				if (nextChar != '=') while (f.nextchar() != '=');
+				f.read_string_flag(stopwordsFile);
+				filePathCvtCode(stopwordsFile);
 			}
 			else if (strcmp(flag, "USE_HMM") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				useHMM = read_bool_flag();
+				if (nextChar != '=') while (f.nextchar() != '=');
+				useHMM = f.read_bool_flag();
 			}
 			else if (strcmp(flag, "USE_STOP") == 0) {
-				if (nextChar != '=') while (fast_getchar() != '=');
-				useStopwords = read_bool_flag();
+				if (nextChar != '=') while (f.nextchar() != '=');
+				useStopwords = f.read_bool_flag();
 			}
 		}
 	}
@@ -151,7 +162,7 @@ void FilmContentSystemApplication::initDictionary(const char * dictFile, const c
 FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 {
 	auto start = clock();
-	std::wstring wfile = read_utf8_file(htmlFile); 
+	std::wstring wfile = FileReader::read_utf8_file(htmlFile); 
 	std::cerr << "Reading Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	
 	start = clock();
@@ -160,7 +171,7 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 
 	return info;
 
-	//return parser.parse(read_utf8_file(htmlFile));
+	//return parser.parse(FileReader::read_utf8_file(htmlFile));
 }
 
 

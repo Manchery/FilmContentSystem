@@ -130,6 +130,7 @@
     <ClInclude Include="HtmlParser.h" />
     <ClInclude Include="HtmlTag.h" />
     <ClInclude Include="Stack.hpp" />
+    <ClInclude Include="FileReader.h" />
     <ClInclude Include="Vector.hpp" />
     <ClInclude Include="WordSegmentor.h" />
   </ItemGroup>
@@ -142,6 +143,7 @@
     <ClCompile Include="FilmInfo.cpp" />
     <ClCompile Include="HtmlParser.cpp" />
     <ClCompile Include="HtmlTag.cpp" />
+    <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="WordSegmentor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
