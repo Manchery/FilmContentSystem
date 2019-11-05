@@ -55,7 +55,7 @@ int CharStringLink::search(const CharString & s) {
 	int idx = 0;
 	for (node* p = head; p; p = p->next, idx++) {
 		if (p->str == s)
-			return idx;
+			return idx;		// 第一个位置
 	}
 	return -1;
 }
@@ -78,13 +78,14 @@ void CharStringLink::remove(node * x) {
 void CharStringLink::remove(const CharString & s) {
 	for (node* p = head; p; p = p->next)
 		if (p->str == s) {
-			remove(p);
+			remove(p);		// 只删除了一个节点
 			return;
 		}
 }
 
 void CharStringLink::concat(const CharStringLink & b)
 {
+	// 采用拷贝的形式实现，b链表仍可用
 	for (node *p = b.head; p; p = p->next) {
 		push_back(new node{ p->str, nullptr, nullptr });
 	}

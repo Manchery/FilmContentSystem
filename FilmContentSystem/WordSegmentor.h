@@ -12,7 +12,7 @@ WordSegmentor
 接口：	载入词典和HMM参数：loadDict/loadHMM/loadStopwords
 		中文分词：cut
 算法：	参考jieba中文分词的算法，并自己用C++语言实现。[jieba](https://github.com/fxsjy/jieba/)
-		a. cutDAG：根据词典中给出的词频，用动态规划求出最大概率分割 f[i] = max_j { f[j-1]*(freq[s(i,j)]/total_freq)}
+		a. cutDAG：根据词典中给出的词频，用动态规划求出最大概率分割 f[i] = max_j { f[j-1]*(freq[s(j,i)]/total_freq)}
 			注：为避免精度误差，在对数下计算
 		b. cutHMM：由于以上DP算法倾向于将未登录词拆分成单字，因此使用HMM（隐马尔可夫模型）来处理连续的单字序列
 			具体地，HMM中每个观测（单字）分别有四种可能的隐状态（BMES，分别表示词的开始，词中，词的结尾，以及单字成词）
