@@ -261,4 +261,4 @@ __pycache__/
 *.pyc
 
 # Project
-movie-scraper/movies/*
+movie-scraper/movies
