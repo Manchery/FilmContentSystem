@@ -68,11 +68,11 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 		}
 	}
 	else { // by Default
-		strcmp(inputDir, DEFAULT_INPUT_DIR);
-		strcmp(outputDir, DEFAULT_OUTPUT_DIR);
-		strcmp(dictFile, DEFAULT_DICT_PATH);
-		strcmp(hmmFile, DEFAULT_HMM_PATH);
-		strcmp(stopwordsFile, DEFAULT_STOP_PATH);
+		strcpy_s(inputDir, DEFAULT_INPUT_DIR);
+		strcpy_s(outputDir, DEFAULT_OUTPUT_DIR);
+		strcpy_s(dictFile, DEFAULT_DICT_PATH);
+		strcpy_s(hmmFile, DEFAULT_HMM_PATH);
+		strcpy_s(stopwordsFile, DEFAULT_STOP_PATH);
 		useHMM = DEFAULT_USE_HMM; 
 		useStopwords = DEFAULT_USE_STOP;
 	}

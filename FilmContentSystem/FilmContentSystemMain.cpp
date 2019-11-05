@@ -47,5 +47,6 @@ int main() {
 		"C:\\Users\\Manchery\\Desktop\\output.txt");*/
 	_main();
 	_CrtDumpMemoryLeaks();
+	system("pause");
 	return 0;
 }
