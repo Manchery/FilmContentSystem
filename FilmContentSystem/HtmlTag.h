@@ -53,5 +53,6 @@ public:
 	// 查找是否有给定属性
 	bool hasAttribute(const CharString &key) const;
 	bool hasAttribute(const CharString &key, const CharString &value) const;
+	CharString attributeValue(const CharString &key) const;
 };
 

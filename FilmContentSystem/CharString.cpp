@@ -114,6 +114,17 @@ int CharString::indexOf(const CharString & b) const
 	return ans;
 }
 
+double CharString::toDouble() const
+{
+	double result; int i;
+	for (i = 0; i < _len && _str[i] != '.'; i++)
+		result = result * 10 + _str[i] - '0';
+	double base = 1;
+	for (i++; i < _len; i++)
+		base *= 0.1, result += base * (_str[i] - '0');
+	return result;
+}
+
 CharString& CharString::assign(const CharString & b)
 {
 	if (b._len > _capacity) {

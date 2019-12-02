@@ -56,6 +56,9 @@ public:
 	// 子串查找，返回第一次出现的位置，使用KMP算法
 	int indexOf(const CharString &b) const;
 
+	// 将字符串的值转化为double
+	double toDouble() const;
+
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
 	friend std::wostream & operator << (std::wostream & os, const CharString &str);
 	friend CharString concat(const CharString &a, const CharString &b);
