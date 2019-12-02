@@ -10,12 +10,15 @@ public:
 		node(int id = -1, double rating = -1) :id(id), rating(rating), prev(nullptr), next(nullptr) { }
 		~node(){ }
 	};
-	DocumentList();
+	int termId;
+	DocumentList(int termId = -1);
 	~DocumentList();
 	bool add(int id, double rating = 1);
 	bool remove(int id);
 	double search(int id) const;
 	bool edit(int id, double rating);
+
+	bool empty() const { return head == nullptr; }
 protected:
 	node *head;
 	void destructList(node *x);

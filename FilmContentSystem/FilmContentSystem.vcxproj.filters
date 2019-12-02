@@ -66,6 +66,12 @@
     <ClInclude Include="BalancedBST.hpp">
       <Filter>头文件\data structure</Filter>
     </ClInclude>
+    <ClInclude Include="DocumentList.h">
+      <Filter>头文件\data structure</Filter>
+    </ClInclude>
+    <ClInclude Include="InvertedIndex.hpp">
+      <Filter>头文件\data structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FilmContentSystemMain.cpp">
@@ -97,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="FileReader.cpp">
       <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentList.cpp">
+      <Filter>源文件\data structure</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

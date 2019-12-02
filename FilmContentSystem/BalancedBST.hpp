@@ -46,6 +46,9 @@ public:
 			result = newNode(key, data()), insert(result);
 		return result->data;
 	}
+	bool find(const key_t &key) {
+		return findNode(key) != nullptr;
+	}
 
 protected:
 	node *root;

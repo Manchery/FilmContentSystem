@@ -1,7 +1,7 @@
 #include "DocumentList.h"
 
-DocumentList::DocumentList() {
-	head = nullptr;
+DocumentList::DocumentList(int termId) : termId(termId), head(nullptr) {
+
 }
 
 DocumentList::~DocumentList() {
@@ -25,7 +25,8 @@ bool DocumentList::remove(int id) {
 }
 
 double DocumentList::search(int id) const {
-	return findNode(id)->rating;
+	node *x = findNode(id);
+	return x ? x->rating : 0;
 }
 
 bool DocumentList::edit(int id, double rating) {
