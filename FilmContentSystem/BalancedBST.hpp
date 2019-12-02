@@ -40,6 +40,12 @@ public:
 		if (result == null) return false;
 		remove(result); return true;
 	}
+	data_t& operator [](const key_t &key) {
+		node *result = findNode(key);
+		if (result == null)
+			result = newNode(key, data()), insert(result);
+		return result->data;
+	}
 
 protected:
 	node *root;
