@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BalancedBST.hpp" />
     <ClInclude Include="CharString.h" />
     <ClInclude Include="CharStringLink.h" />
     <ClInclude Include="common.h" />

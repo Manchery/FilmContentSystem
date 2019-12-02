@@ -63,6 +63,9 @@
     <ClInclude Include="FileReader.h">
       <Filter>头文件\common</Filter>
     </ClInclude>
+    <ClInclude Include="BalancedBST.hpp">
+      <Filter>头文件\data structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FilmContentSystemMain.cpp">
