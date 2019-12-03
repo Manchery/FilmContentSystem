@@ -66,6 +66,9 @@ public:
 	void concat(const CharStringLink &b);
 	bool empty() const { return head == nullptr; }
 
+	CharString& front() { return head->str; }
+	CharString& back() { return tail->str; }
+
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
 

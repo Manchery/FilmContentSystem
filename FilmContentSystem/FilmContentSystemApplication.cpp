@@ -102,7 +102,7 @@ void FilmContentSystemApplication::loadDatabase()
 			if (!endsWith(file.name, ".html"))
 				continue;
 
-			std::cerr << "Found file" << file.name << "..." << std::endl;
+			std::cerr << "Found file " << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
 			strncpy_s(baseName, file.name, strlen(file.name) - 5);
@@ -121,7 +121,7 @@ void FilmContentSystemApplication::loadDatabase()
 				readFilmWord(txtFile, filmWords[docId]);
 			}
 			else {
-				std::cerr << "Processing file" << file.name << "..." << std::endl;
+				std::cerr << "Processing file " << file.name << "..." << std::endl;
 				// 解析 html
 				auto info = extractInfo(filePath);
 				std::wofstream wfout(infoFile);
@@ -154,7 +154,7 @@ void FilmContentSystemApplication::run(const char * configFile)
 
 	loadDatabase();
 	
-	buildIndex();
+	//buildIndex();
 }
 
 bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
@@ -195,11 +195,68 @@ void readFilmInfo(const char *file, FilmInfo & info)
 {
 	std::wifstream wfin(file);
 	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+	std::wstring buf;
 
+	bool isFirst = true;
+	CharStringLink *cur = nullptr;
+	while (!wfin.eof()) {
+		wfin >> buf;
+		if (isFirst) {
+			info.setName(buf), isFirst = false;
+			continue;
+		}
+		if (buf == L"导演:") { cur = &info._directors, cur->push_back(CharString()); }
+		else if (buf == L"编剧:") { 
+			cur = &info._screenwriters, cur->push_back(CharString()); }
+		else if (buf == L"主演:") {
+			cur = &info._stars, cur->push_back(CharString()); }
+		else if (buf == L"类型:") {
+			cur = &info._genres, cur->push_back(CharString()); }
+		else if (buf == L"制片国家/地区:") {
+			cur = &info._regions, cur->push_back(CharString()); }
+		else if (buf == L"语言:") {
+			cur = &info._languages, cur->push_back(CharString()); }
+		else if (buf == L"上映日期:") {
+			cur = &info._dates, cur->push_back(CharString()); }
+		else if (buf == L"片长:") {
+			cur = &info._durations, cur->push_back(CharString()); }
+		else if (buf == L"又名:") {
+			cur = &info._alternates, cur->push_back(CharString()); }
+		else if (buf == L"标签:") {
+			cur = &info._tags, cur->push_back(CharString()); }
+		else if (buf == L"评分:") {
+			wfin >> info._rating;
+		}
+		else if (buf == L"剧情简介:") {
+			wchar_t line[1000];
+			wfin.getline(line, 1000);
+			while (!wfin.eof()) {
+				wfin.getline(line, 1000);
+				if (!info._introduction.empty()) info._introduction += L"\n";
+				info._introduction += line;
+			}
+		}
+		else if (buf == L"/") {
+			if (cur) cur->push_back(CharString());
+		}
+		else {
+			if (cur) {
+				if (!cur->back().empty()) cur->back() += L" ";
+				cur->back() += buf;
+			}
+		}
+	}
 	wfin.close();
 }
 
 void readFilmWord(const char *file, CharStringLink & cuts)
 {
-
+	std::wifstream wfin(file);
+	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+	std::wstring word; 
+	while (!wfin.eof()) {
+		wfin >> word;
+		cuts.push_back(word);
+	}
+	wfin.close();
 }

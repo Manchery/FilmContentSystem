@@ -21,8 +21,8 @@ private:
 	CharString _name, _introduction;
 	// 导演、编剧、主演、类型、地区、语言、上映日期、时长、又名
 	CharStringLink _directors, _screenwriters, _stars, _genres, _regions, _languages, _dates, _durations, _alternates;
-	CharStringLink _tags;
-	double _rating;
+	CharStringLink _tags;	// 标签
+	double _rating;			// 评分
 
 public:
 	FilmInfo();
@@ -56,6 +56,7 @@ public:
 	void setRating(double rating) { _rating = rating; }
 
 	friend std::wostream & operator<<(std::wostream & os, const FilmInfo & info);
+	friend void readFilmInfo(const char *file, FilmInfo &info);
 };
 
 extern std::wostream & operator<<(std::wostream & os, const FilmInfo & info);

@@ -227,7 +227,8 @@ void HtmlParser::postProcessTag(const HtmlTag & tag, FilmInfo & info)
 	else if (tag.hasAttribute(L"property", L"v:summary") || tag.hasAttribute(L"class", L"all hidden")) {
 		info.setIntroduction(postProcessSummary(tag.content()));
 	}
-	else if (tag.type() == L"a" && tag.hasAttribute(L"href") && tag.attributeValue(L"href").substring(0, 5) == L"/tag/") {
+	else if (tag.type() == L"a" && tag.hasAttribute(L"href") 
+		&& tag.attributeValue(L"href").length()>5 && tag.attributeValue(L"href").substring(0, 5) == L"/tag/") {
 		info.addTag(tag.content()); // TODO: unit test
 	}
 	else if (tag.type() == L"strong" && tag.hasAttribute(L"class", L"ll rating_num")) {
