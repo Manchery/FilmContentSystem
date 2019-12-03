@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector.hpp"
 #include <algorithm>
 
 // TODO: unit test
@@ -48,6 +49,11 @@ public:
 	}
 	bool find(const key_t &key) {
 		return findNode(key) != nullptr;
+	}
+	Vector<std::pair<key_t, data_t>> list() {
+		Vector<std::pair<key_t, data_t>> res;
+		_list(res, root);
+		return res;
 	}
 
 protected:
@@ -113,6 +119,12 @@ protected:
 			else x = x->ch[1];
 		}
 		return null;
+	}
+	void _list(Vector<std::pair<key_t, data_t>> &vec, node *x) {
+		if (x == null) return;
+		_list(vec, x->ch[0]);
+		vec.push_back(std::make_pair(x->key, x->data));
+		_list(vec, x->ch[1]);
 	}
 };
 

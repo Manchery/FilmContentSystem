@@ -63,6 +63,8 @@ private:
 	Vector<CharStringLink> filmWords;
 
 	InvertedIndex<SplayTree> wordIndex, genreIndex;
+
+	HashMap<CharString, int, charStringHash> filmIdMap;
 public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();
@@ -71,12 +73,16 @@ public:
 
 	// 读取 config，要求config文件采用 UTF-8 编码
 	void loadConfig(const char *configFile);
-	
 	// 载入电影数据库
 	void loadDatabase();
-
 	// 建立倒排文档
 	void buildIndex();
+
+	Vector<std::pair<int, int>> retrieve(const CharStringLink &keywords);
+	Vector<std::pair<int, CharString>> recommend(const CharString &fileName);
+
+	void doRetrieve();
+	void doRecommend();
 
 	// 读取字典、HMM参数、停用词典
 	bool initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);

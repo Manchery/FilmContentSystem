@@ -141,6 +141,7 @@ void FilmContentSystemApplication::loadDatabase()
 				wfout.close();
 				filmWords[docId] = cuts;
 			}
+			filmIdMap[filmInfos[docId].name()] = docId;
 		}
 	}
 	_findclose(lf);
@@ -162,6 +163,52 @@ void FilmContentSystemApplication::buildIndex()
 			genreIndex.add(*it, i, info.rating());
 		}
 	}
+}
+
+Vector<std::pair<int, int>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords)
+{
+	using std::pair;
+	struct data_t {
+		int cnt, tot; // 不同词数、总次数
+		int clk; // 时间戳
+	};
+	int clk = 0;
+	SplayTree<int, data_t> Map;	// first：电影 id
+	for (auto it = keywords.begin(); it != keywords.end(); ++it) {
+		++clk;
+		CharString word = *it;
+		TermInfo term = wordIndex.search(word);
+		for (auto p = term.list.begin(); p != term.list.end(); ++p) {
+			data_t &data = Map[p.id()];
+			if (data.clk != clk) data.clk = clk, data.cnt++;
+			data.tot++;
+		}
+	}
+	// TODO: speed optimize
+	Vector<pair<int, data_t>> nodes = Map.list();
+	typedef bool(*cmpFunc)(const pair<int, data_t>&, const pair<int, data_t>&);
+	// TODO: debug
+	nodes.sort(cmpFunc{ [](const pair<int, data_t>& a, const pair<int, data_t> &b) {
+		data_t aD = a.second ,bD = b.second;
+		return aD.cnt == bD.cnt ? aD.tot > bD.tot: aD.cnt > bD.cnt;
+	} });
+	Vector<pair<int, int>> res;
+	for (int i = 0; i < nodes.size(); i++)
+		res.push_back(std::make_pair(nodes[i].first, nodes[i].second.tot));
+	return res;
+}
+
+Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(const CharString & fileName)
+{
+	return Vector<std::pair<int, CharString>>();
+}
+
+void FilmContentSystemApplication::doRetrieve()
+{
+}
+
+void FilmContentSystemApplication::doRecommend()
+{
 }
 
 void FilmContentSystemApplication::run(const char * configFile)

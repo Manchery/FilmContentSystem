@@ -110,5 +110,12 @@ public:
 	bool empty() const {
 		return _size == 0;
 	}
+	typedef bool (*cmpFunc)(const value_t&, const value_t&);
+	void sort(cmpFunc cmp) {
+		std::sort(_vector, _vector + _size, cmp);
+	}
+	void sort() {
+		std::sort(_vector, _vector + _size);
+	}
 };
 
