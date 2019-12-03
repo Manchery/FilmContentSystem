@@ -28,42 +28,51 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 	if (!f.bad()) {
 		char flag[MAX_FLAG_LEN], nextChar;
 		while (f.read_flag_name(flag, nextChar) != -1) {
+			if (nextChar != '=') while (f.nextchar() != '=');
+
 			if (strcmp(flag, "INPUT_DIR") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(inputDir);
 				filePathCvtCode(inputDir);
-				if (!endsWith(inputDir, "/")) 
-					strcat_s(inputDir, "/");
+				if (!endsWith(inputDir, "/")) strcat_s(inputDir, "/");
 			}
 			else if (strcmp(flag, "OUTPUT_DIR") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(outputDir);
 				filePathCvtCode(outputDir);
-				if (!endsWith(outputDir, "/")) 
-					strcat_s(outputDir, "/");
+				if (!endsWith(outputDir, "/")) strcat_s(outputDir, "/");
 			}
 			else if (strcmp(flag, "DICT_PATH") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(dictFile);
 				filePathCvtCode(dictFile);
 			}
 			else if (strcmp(flag, "HMM_PATH") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(hmmFile);
 				filePathCvtCode(hmmFile);
 			}
 			else if (strcmp(flag, "STOP_PATH") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				f.read_string_flag(stopwordsFile);
 				filePathCvtCode(stopwordsFile);
 			}
 			else if (strcmp(flag, "USE_HMM") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				useHMM = f.read_bool_flag();
 			}
 			else if (strcmp(flag, "USE_STOP") == 0) {
-				if (nextChar != '=') while (f.nextchar() != '=');
 				useStopwords = f.read_bool_flag();
+			}
+			else if (strcmp(flag, "RETRIEVAL_INPUT") == 0) {
+				f.read_string_flag(retrieInput);
+				filePathCvtCode(retrieInput);
+			}
+			else if (strcmp(flag, "RETRIEVAL_OUTPUT") == 0) {
+				f.read_string_flag(retrieOutput);
+				filePathCvtCode(retrieOutput);
+			}
+			else if (strcmp(flag, "RECOMMEND_INPUT") == 0) {
+				f.read_string_flag(recommInput);
+				filePathCvtCode(recommInput);
+			}
+			else if (strcmp(flag, "RECOMMEND_OUTPUT") == 0) {
+				f.read_string_flag(recommOutput);
+				filePathCvtCode(recommOutput);
 			}
 		}
 	}
@@ -76,6 +85,11 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 		useHMM = DEFAULT_USE_HMM; 
 		useStopwords = DEFAULT_USE_STOP;
 	}
+}
+
+void FilmContentSystemApplication::loadDatabase()
+{
+
 }
 
 void FilmContentSystemApplication::run(const char * configFile)
@@ -142,34 +156,34 @@ void FilmContentSystemApplication::run(const char * configFile)
 
 bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
 {
-	auto start = clock();
+	//auto start = clock();
 	if (!segmentor.loadDict(dictFile))
 		return false;
-	std::cerr << "Loading Dictionary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+	//std::cerr << "Loading Dictionary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 
 	if (hmmFile) {
-		start = clock();
+		//start = clock();
 		segmentor.loadHMM(hmmFile);
-		std::cerr << "Loading HMM times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+		//std::cerr << "Loading HMM times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	}
 
 	if (stopwordsFile) {
-		start = clock();
+		//start = clock();
 		segmentor.loadStopwords(stopwordsFile);
-		std::cerr << "Loading Stopwords times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+		//std::cerr << "Loading Stopwords times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	}
 	return true;
 }
 
 FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 {
-	auto start = clock();
+	//auto start = clock();
 	std::wstring wfile = FileReader::read_utf8_file(htmlFile); 
-	std::cerr << "Reading Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+	//std::cerr << "Reading Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	
-	start = clock();
+	//start = clock();
 	FilmInfo info = parser.parse(wfile);
-	std::cerr << "Parsing Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+	//std::cerr << "Parsing Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 
 	return info;
 

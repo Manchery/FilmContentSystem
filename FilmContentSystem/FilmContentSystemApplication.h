@@ -18,6 +18,11 @@ const char DEFAULT_STOP_PATH[] = "dict/stopwords.txt";
 const bool DEFAULT_USE_HMM = true;
 const bool DEFAULT_USE_STOP = false;
 
+const char RETRIEVAL_INPUT[] = "query1.txt";
+const char RETRIEVAL_OUTPUT[] = "result1.txt";
+const char RECOMMEND_INPUT[] = "query2.txt";
+const char RECOMMEND_OUTPUT[] = "result2.txt";
+
 const int MAX_FLAG_LEN = 500;	// config中flag的最大长度
 
 /*-------------------------END: 默认的config-------------------------*/
@@ -40,6 +45,8 @@ private:
 	
 	// 输入输出文件存放的路径
 	char inputDir[MAX_FLAG_LEN], outputDir[MAX_FLAG_LEN];
+	char retrieInput[MAX_FLAG_LEN], retrieOutput[MAX_FLAG_LEN];
+	char recommInput[MAX_FLAG_LEN], recommOutput[MAX_FLAG_LEN];
 	// 词典、HMM参数、停用词典的路径
 	char dictFile[MAX_FLAG_LEN], hmmFile[MAX_FLAG_LEN], stopwordsFile[MAX_FLAG_LEN];
 	// 分词是否启用 HMM 和停用词
@@ -52,6 +59,9 @@ public:
 
 	// 读取 config，要求config文件采用 UTF-8 编码
 	void loadConfig(const char *configFile);
+	
+	// 载入电影数据库
+	void loadDatabase();
 
 	// 读取字典、HMM参数、停用词典
 	bool initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);
