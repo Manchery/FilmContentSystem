@@ -4,6 +4,8 @@
 #include "WordSegmentor.h"
 #include "HtmlParser.h"
 #include "Vector.hpp"
+#include "InvertedIndex.hpp"
+#include "BalancedBST.hpp"
 
 /*-------------------------默认的config-----------------------------*/
 
@@ -53,10 +55,14 @@ private:
 	// 分词是否启用 HMM 和停用词
 	bool useHMM, useStopwords;
 
+	// 字典是否已加载，只有分词时才加载字典
 	bool dicLoaded;
+	int docCnt;
 
 	Vector<FilmInfo> filmInfos;
 	Vector<CharStringLink> filmWords;
+
+	InvertedIndex<SplayTree> wordIndex, genreIndex;
 public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();

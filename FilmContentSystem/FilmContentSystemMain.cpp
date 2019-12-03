@@ -10,11 +10,13 @@ using namespace std;
 
 void _main() {
 	auto start = clock();
+
 #ifdef _DEBUG
 	FilmContentSystemApplication().run("../Debug/FilmContentSystem.config");
 #else
 	FilmContentSystemApplication().run();
 #endif
+
 	std::cerr << std::endl << "Totally times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 }
 

@@ -78,6 +78,10 @@ public:
 			_capacity = cap;
 		}
 	}
+	void resize(int siz) {
+		reserve(siz);
+		_size = siz;
+	}
 	void push_back(const value_t & item) {
 		if (_capacity == 0 || _size == _capacity) {
 			// 如果当前容量不足，将容量翻倍，该操作的均摊复杂度为 O(1)

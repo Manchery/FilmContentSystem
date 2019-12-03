@@ -21,3 +21,6 @@ extern bool isNumber(const CharString &str);	// 是否每一位 isDigit
 extern bool isSpaces(const CharString &str);	// 是否每一位 iswspace
 
 extern bool endsWith(const char * str, const char *end);	// str是否以end结尾
+
+template<typename T1, typename T2>
+constexpr auto Max(T1 a, T2 b) { return ((a) > (b) ? (a) : (b)); }

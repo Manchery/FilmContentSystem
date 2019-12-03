@@ -14,11 +14,11 @@ public:
 		void update() { size = ch[0]->size + ch[1]->size + 1; }
 	}*null;
 
-	BalancedBST() {
+	SplayTree() {
 		root = null = new node; null->ch[0] = null->ch[1] = null->p = null; null->size = 0;
 	}
-	~BalancedBST() {
-		destructTree(rt);
+	~SplayTree() {
+		destructTree(root);
 		delete null;
 	}
 	void adjust(node *x) {
@@ -43,7 +43,7 @@ public:
 	data_t& operator [](const key_t &key) {
 		node *result = findNode(key);
 		if (result == null)
-			result = newNode(key, data()), insert(result);
+			result = newNode(key, data_t()), insert(result);
 		return result->data;
 	}
 	bool find(const key_t &key) {
@@ -52,17 +52,18 @@ public:
 
 protected:
 	node *root;
-	void newNode(const key_t& key, const data_t& data) {
+	node* newNode(const key_t& key, const data_t& data) {
 		node *x = new node;
 		x->ch[0] = x->ch[1] = x->p = null; x->size = 1;
 		x->key = key; x->data = data;
+		return x;
 	}
 	void destructTree(node *rt) {
 		if (rt == null) return;
 		destructTree(rt->ch[0]); destructTree(rt->ch[1]);
-		delete null;
+		delete rt;
 	}
-	void rotate() {
+	void rotate(node *x) {
 		if (x == null) return;
 		if (x->p == root) root = x;
 		bool d = x->direction(); node *p = x->p;
@@ -73,7 +74,7 @@ protected:
 		if (x == null) return;
 		while (x != rt)
 			if (x->p == rt)
-				rot(x);
+				rotate(x);
 			else {
 				if (x->direction() == x->p->direction())
 					rotate(x->p), rotate(x);
@@ -86,8 +87,14 @@ protected:
 		node *x = root, *y = null;
 		if (root == null) { root = z; return; }
 		while (x != null)
-			y = x, x = x->ch[1];
-		y->setChild(z, 1);
+			if (z->key < x->key)
+				y = x, x = x->ch[0];
+			else
+				y = x, x = x->ch[1];
+		if (z->key < y->key)
+			y->setChild(z, 0);
+		else
+			y->setChild(z, 1);
 		splay(root, z);
 	}
 	void remove(node *x) {
@@ -98,7 +105,7 @@ protected:
 				rotate(x->ch[1]);
 		x->p->ch[x->direction()] = null; x->p->update(); splay(root, x->p);
 	}
-	node *findNode(const key_y &key) {
+	node *findNode(const key_t &key) {
 		node *x = root;
 		while (x != null) {
 			if (x->key == key) return x;

@@ -10,6 +10,7 @@ FilmContentSystemApplication::FilmContentSystemApplication()
 {
 	useHMM = useStopwords = false;
 	dicLoaded = false;
+	docCnt = 0;
 }
 
 FilmContentSystemApplication::~FilmContentSystemApplication()
@@ -93,8 +94,8 @@ void FilmContentSystemApplication::loadDatabase()
 		std::cerr << inputDir << " not found!" << std::endl;
 	}
 	else {
-		filmInfos.reserve(2000);
-		filmWords.reserve(2000);
+		filmInfos.resize(2000);
+		filmWords.resize(2000);
 		// 遍历输入目录下所有html文件
 		while (_findnext(lf, &file) == 0) {
 			if (strcmp(file.name, ".") == 0 || strcmp(file.name, "..") == 0)
@@ -102,7 +103,7 @@ void FilmContentSystemApplication::loadDatabase()
 			if (!endsWith(file.name, ".html"))
 				continue;
 
-			std::cerr << "Found file " << file.name << "..." << std::endl;
+			// std::cerr << "Found file " << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
 			strncpy_s(baseName, file.name, strlen(file.name) - 5);
@@ -113,15 +114,16 @@ void FilmContentSystemApplication::loadDatabase()
 			char txtFile[MAX_FILE_NAME_LEN] = { 0 };
 			strcat_s(txtFile, outputDir); strcat_s(txtFile, baseName); strcat_s(txtFile, ".txt");
 
-			int docId = atoi(baseName);
-			if (docId >= filmInfos.capacity()) filmInfos.reserve(docId), filmWords.reserve(docId);
+			int docId = atoi(baseName); 
+			docCnt = Max(docCnt, docId + 1);
+			if (docId >= filmInfos.size()) filmInfos.resize(docId), filmWords.resize(docId);
 
 			if (_access(infoFile, 0) == 0 && _access(txtFile, 0) == 0) { // 解析和分词结果已经存在
 				readFilmInfo(infoFile, filmInfos[docId]);
 				readFilmWord(txtFile, filmWords[docId]);
 			}
 			else {
-				std::cerr << "Processing file " << file.name << "..." << std::endl;
+				std::cerr << "Parsing & processing file " << file.name << "..." << std::endl;
 				// 解析 html
 				auto info = extractInfo(filePath);
 				std::wofstream wfout(infoFile);
@@ -142,10 +144,24 @@ void FilmContentSystemApplication::loadDatabase()
 		}
 	}
 	_findclose(lf);
+	std::cerr << "Total " << docCnt << " files. " << std::endl;
 }
 
 void FilmContentSystemApplication::buildIndex()
 {
+	for (int i = 0; i < docCnt; i++) {
+		CharStringLink cut = filmWords[i];
+		if (cut.empty()) continue;
+
+		for (auto it = cut.begin(); it != cut.end(); ++it) {
+			wordIndex.inc(*it, i);
+		}
+		
+		FilmInfo info = filmInfos[i];
+		for (auto it = info.genres().begin(); it != info.genres().end(); ++it) {
+			genreIndex.add(*it, i, info.rating());
+		}
+	}
 }
 
 void FilmContentSystemApplication::run(const char * configFile)
@@ -154,7 +170,7 @@ void FilmContentSystemApplication::run(const char * configFile)
 
 	loadDatabase();
 	
-	//buildIndex();
+	buildIndex();
 }
 
 bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
@@ -199,8 +215,10 @@ void readFilmInfo(const char *file, FilmInfo & info)
 
 	bool isFirst = true;
 	CharStringLink *cur = nullptr;
-	while (!wfin.eof()) {
+	while (true) {
 		wfin >> buf;
+		if (wfin.eof()) break;
+
 		if (isFirst) {
 			info.setName(buf), isFirst = false;
 			continue;
@@ -254,8 +272,9 @@ void readFilmWord(const char *file, CharStringLink & cuts)
 	std::wifstream wfin(file);
 	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 	std::wstring word; 
-	while (!wfin.eof()) {
+	while (true) {
 		wfin >> word;
+		if (wfin.eof()) break;
 		cuts.push_back(word);
 	}
 	wfin.close();

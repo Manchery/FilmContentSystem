@@ -42,9 +42,6 @@ int WordSegmentor::state2Idx(char s)
 	}
 }
 
-template<typename T1, typename T2>
-constexpr auto Max(T1 a, T2 b) { return ((a)>(b)?(a):(b)); }
-
 bool WordSegmentor::loadDict(const char * dictFile)
 {
 	FileReader f(dictFile);
