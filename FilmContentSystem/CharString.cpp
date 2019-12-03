@@ -116,7 +116,7 @@ int CharString::indexOf(const CharString & b) const
 
 double CharString::toDouble() const
 {
-	double result; int i;
+	double result = 0; int i;
 	for (i = 0; i < _len && _str[i] != '.'; i++)
 		result = result * 10 + _str[i] - '0';
 	double base = 1;

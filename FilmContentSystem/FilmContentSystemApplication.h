@@ -3,6 +3,7 @@
 #include "FilmInfo.h"
 #include "WordSegmentor.h"
 #include "HtmlParser.h"
+#include "Vector.hpp"
 
 /*-------------------------默认的config-----------------------------*/
 
@@ -51,6 +52,11 @@ private:
 	char dictFile[MAX_FLAG_LEN], hmmFile[MAX_FLAG_LEN], stopwordsFile[MAX_FLAG_LEN];
 	// 分词是否启用 HMM 和停用词
 	bool useHMM, useStopwords;
+
+	bool dicLoaded;
+
+	Vector<FilmInfo> filmInfos;
+	Vector<CharStringLink> filmWords;
 public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();
@@ -63,6 +69,9 @@ public:
 	// 载入电影数据库
 	void loadDatabase();
 
+	// 建立倒排文档
+	void buildIndex();
+
 	// 读取字典、HMM参数、停用词典
 	bool initDictionary(const char *dictFile, const char *hmmFile = nullptr, const char *stopwordsFile = nullptr);
 	// 解析Html
@@ -71,3 +80,6 @@ public:
 	CharStringLink divideWords(const CharString &passage, bool useHMM, bool useStopwords);
 };
 
+extern void filePathCvtCode(char *filepath);
+extern void readFilmInfo(const char *file, FilmInfo &info);
+extern void readFilmWord(const char *file, CharStringLink &cuts);

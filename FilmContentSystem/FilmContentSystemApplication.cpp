@@ -9,17 +9,11 @@
 FilmContentSystemApplication::FilmContentSystemApplication()
 {
 	useHMM = useStopwords = false;
+	dicLoaded = false;
 }
 
 FilmContentSystemApplication::~FilmContentSystemApplication()
 {
-}
-
-// 将文件路径转化为 ANSI 编码
-static void filePathCvtCode(char *filepath) {
-	wchar_t tmp[MAX_FLAG_LEN];
-	MultiByteToWideChar(CP_UTF8, 0, filepath, -1, tmp, MAX_FLAG_LEN);
-	WideCharToMultiByte(CP_ACP, 0, tmp, -1, filepath, MAX_FLAG_LEN, NULL, 0);
 }
 
 void FilmContentSystemApplication::loadConfig(const char * configFile)
@@ -89,19 +83,7 @@ void FilmContentSystemApplication::loadConfig(const char * configFile)
 
 void FilmContentSystemApplication::loadDatabase()
 {
-
-}
-
-void FilmContentSystemApplication::run(const char * configFile)
-{
-	if (configFile != nullptr)
-		loadConfig(configFile);
-	else
-		loadConfig(DEFAULT_CONFIG_PATH);
-
 	_mkdir(outputDir);
-
-	if (!initDictionary(dictFile, hmmFile, stopwordsFile)) return;
 
 	_finddata_t file;
 	long lf; const int MAX_FILE_NAME_LEN = 1000;
@@ -111,6 +93,8 @@ void FilmContentSystemApplication::run(const char * configFile)
 		std::cerr << inputDir << " not found!" << std::endl;
 	}
 	else {
+		filmInfos.reserve(2000);
+		filmWords.reserve(2000);
 		// 遍历输入目录下所有html文件
 		while (_findnext(lf, &file) == 0) {
 			if (strcmp(file.name, ".") == 0 || strcmp(file.name, "..") == 0)
@@ -118,7 +102,7 @@ void FilmContentSystemApplication::run(const char * configFile)
 			if (!endsWith(file.name, ".html"))
 				continue;
 
-			std::cerr << "Found " << file.name << "..." << std::endl;
+			std::cerr << "Found file" << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
 			strncpy_s(baseName, file.name, strlen(file.name) - 5);
@@ -129,75 +113,93 @@ void FilmContentSystemApplication::run(const char * configFile)
 			char txtFile[MAX_FILE_NAME_LEN] = { 0 };
 			strcat_s(txtFile, outputDir); strcat_s(txtFile, baseName); strcat_s(txtFile, ".txt");
 
-			/*------------------------------------------------------------------------------------*/
+			int docId = atoi(baseName);
+			if (docId >= filmInfos.capacity()) filmInfos.reserve(docId), filmWords.reserve(docId);
 
-			// 解析 html
-			auto info = extractInfo(filePath);
-
-			std::wofstream wfout(infoFile);
-			wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-			wfout << info;
-			wfout.close();
-
-			wfout.open(txtFile);
-			wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-			// 中文分词
-			CharStringLink cuts = divideWords(info.introduction(), useHMM, useStopwords);
-			for (auto it = cuts.begin(); it != cuts.end(); ++it) {
-				wfout << *it << std::endl;
+			if (_access(infoFile, 0) == 0 && _access(txtFile, 0) == 0) { // 解析和分词结果已经存在
+				readFilmInfo(infoFile, filmInfos[docId]);
+				readFilmWord(txtFile, filmWords[docId]);
 			}
-			wfout.close();
+			else {
+				std::cerr << "Processing file" << file.name << "..." << std::endl;
+				// 解析 html
+				auto info = extractInfo(filePath);
+				std::wofstream wfout(infoFile);
+				wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+				wfout << info;
+				wfout.close();
+				filmInfos[docId] = info;
 
-			/*------------------------------------------------------------------------------------*/
+				// 中文分词
+				CharStringLink cuts = divideWords(info.introduction(), useHMM, useStopwords);
+				wfout.open(txtFile);
+				wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+				for (auto it = cuts.begin(); it != cuts.end(); ++it)
+					wfout << *it << std::endl;
+				wfout.close();
+				filmWords[docId] = cuts;
+			}
 		}
 	}
 	_findclose(lf);
 }
 
+void FilmContentSystemApplication::buildIndex()
+{
+}
+
+void FilmContentSystemApplication::run(const char * configFile)
+{
+	loadConfig(configFile != nullptr ? configFile : DEFAULT_CONFIG_PATH);
+
+	loadDatabase();
+	
+	buildIndex();
+}
+
 bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
 {
-	//auto start = clock();
 	if (!segmentor.loadDict(dictFile))
 		return false;
-	//std::cerr << "Loading Dictionary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
-
-	if (hmmFile) {
-		//start = clock();
-		segmentor.loadHMM(hmmFile);
-		//std::cerr << "Loading HMM times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
-	}
-
-	if (stopwordsFile) {
-		//start = clock();
-		segmentor.loadStopwords(stopwordsFile);
-		//std::cerr << "Loading Stopwords times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
-	}
+	if (hmmFile) segmentor.loadHMM(hmmFile);
+	if (stopwordsFile) segmentor.loadStopwords(stopwordsFile);
+	dicLoaded = true;
 	return true;
 }
 
 FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 {
-	//auto start = clock();
-	std::wstring wfile = FileReader::read_utf8_file(htmlFile); 
-	//std::cerr << "Reading Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
-	
-	//start = clock();
-	FilmInfo info = parser.parse(wfile);
-	//std::cerr << "Parsing Html times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
-
-	return info;
-
-	//return parser.parse(FileReader::read_utf8_file(htmlFile));
+	return parser.parse(FileReader::read_utf8_file(htmlFile));
 }
 
 
 CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
-	auto start = clock();
-	CharStringLink res = segmentor.cut(passage, useHMM, useStopwords);
-	std::cerr << "Segmenting summary times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+	if (!dicLoaded) {
+		if (!initDictionary(dictFile, hmmFile, stopwordsFile)) {
+			std::cerr << "Load dictionary failed !" << std::endl;
+			return CharStringLink();
+		}
+	}
+	return segmentor.cut(passage, useHMM, useStopwords);
+}
 
-	return res;
+// 将文件路径转化为 ANSI 编码
+void filePathCvtCode(char *filepath) {
+	wchar_t tmp[MAX_FLAG_LEN];
+	MultiByteToWideChar(CP_UTF8, 0, filepath, -1, tmp, MAX_FLAG_LEN);
+	WideCharToMultiByte(CP_ACP, 0, tmp, -1, filepath, MAX_FLAG_LEN, NULL, 0);
+}
 
-	//return segmentor.cut(passage, useHMM, useStopwords);
+void readFilmInfo(const char *file, FilmInfo & info)
+{
+	std::wifstream wfin(file);
+	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+
+	wfin.close();
+}
+
+void readFilmWord(const char *file, CharStringLink & cuts)
+{
+
 }
