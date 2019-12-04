@@ -29,7 +29,10 @@ public:
 	iterator end() const { return iterator(nullptr); }
 
 	DocumentList(int termId = -1);
+	DocumentList(const DocumentList &b);
 	~DocumentList();
+
+	DocumentList& operator = (const DocumentList &b);
 
 	bool add(int id, double rating = 1);
 	bool remove(int id);

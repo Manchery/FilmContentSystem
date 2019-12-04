@@ -198,7 +198,7 @@ Vector<std::pair<int, int>> FilmContentSystemApplication::retrieve(const CharStr
 	return res;
 }
 
-Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId)
+Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(const CharString & fileName)
 {
 	return Vector<std::pair<int, CharString>>();
 }
@@ -237,12 +237,6 @@ void FilmContentSystemApplication::doRetrieve()
 
 void FilmContentSystemApplication::doRecommend()
 {
-	std::wifstream wfin(recommInput);
-	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-	std::wofstream wfout(recommOutput);
-	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
-
-	wfin.close(); wfout.close();
 }
 
 void FilmContentSystemApplication::run(const char * configFile)

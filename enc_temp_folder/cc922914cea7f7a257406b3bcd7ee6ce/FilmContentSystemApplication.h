@@ -79,7 +79,7 @@ public:
 	void buildIndex();
 
 	Vector<std::pair<int, int>> retrieve(const CharStringLink &keywords);
-	Vector<std::pair<int, CharString>> recommend(int docId);
+	Vector<std::pair<int, CharString>> recommend(const CharString &fileName);
 
 	void doRetrieve();
 	void doRecommend();

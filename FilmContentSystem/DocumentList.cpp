@@ -4,14 +4,37 @@ DocumentList::DocumentList(int termId) : termId(termId), head(nullptr) {
 
 }
 
+DocumentList::DocumentList(const DocumentList & b)
+{
+	head = nullptr; termId = b.termId;
+	node *tail = nullptr, *p = b.head;
+	while (p) tail = p, p = p->next;
+	p = tail; 
+	while (p) 
+		add(p->id, p->rating), p = p->prev;
+}
+
 DocumentList::~DocumentList() {
 	destructList(head);
+}
+
+DocumentList & DocumentList::operator=(const DocumentList & b)
+{
+	destructList(head);
+
+	head = nullptr; termId = b.termId;
+	node *tail = nullptr, *p = b.head;
+	while (p) tail = p, p = p->next;
+	p = tail;
+	while (p) add(p->id, p->rating), p = p->prev;
+	return *this;
 }
 
 bool DocumentList::add(int id, double rating) {
 	if (findNode(id) != nullptr) return false;
 	node *x = new node(id, rating);
-	x->next = head; head = x;
+	x->next = head; if (head) head->prev = x;
+	head = x;
 	adjust(head); return true;
 }
 
@@ -54,10 +77,12 @@ DocumentList::node * DocumentList::findNode(int id) const {
 void DocumentList::adjust(node * x) {
 	while (true) {
 		if (x->next != nullptr && x->rating < x->next->rating) {
-			std::swap(x->id, x->next->id); x = x->next;
+			std::swap(x->id, x->next->id); std::swap(x->rating, x->next->rating);
+			x = x->next;
 		}
 		else if (x->prev != nullptr && x->rating > x->prev->rating) {
-			std::swap(x->id, x->prev->id); x = x->prev;
+			std::swap(x->id, x->prev->id); std::swap(x->rating, x->prev->rating);
+			x = x->prev;
 		}
 		else
 			break;
