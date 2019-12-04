@@ -338,13 +338,12 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 	return parser.parse(FileReader::read_utf8_file(htmlFile));
 }
 
-
 CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
 	return segmentor.cut(passage, useHMM, useStopwords);
 }
 
-// 将文件路径转化为 ANSI 编码
+
 void filePathCvtCode(char *filepath) {
 	wchar_t tmp[MAX_FLAG_LEN];
 	MultiByteToWideChar(CP_UTF8, 0, filepath, -1, tmp, MAX_FLAG_LEN);

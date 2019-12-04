@@ -57,11 +57,13 @@ private:
 
 	int docCnt;
 
+	// 电影信息解析结果
 	Vector<FilmInfo> filmInfos;
+	// 剧情简介分词结果
 	Vector<CharStringLink> filmWords;
-
+	// 分词、类型对应的倒排文档，分别用于检索和推荐
 	InvertedIndex<SplayTree> wordIndex, genreIndex;
-
+	// 将电影名映射到电影id
 	HashMap<CharString, int, charStringHash> filmIdMap;
 public:
 	FilmContentSystemApplication();
@@ -75,11 +77,9 @@ public:
 	void loadDatabase();
 	// 建立倒排文档
 	void buildIndex();
-
-	Vector<std::pair<int, int>> retrieve(const CharStringLink &keywords);
-	Vector<std::pair<int, CharString>> recommend(int docId, int topK);
-
+	// 批量检索
 	void doRetrieve();
+	// 批量推荐
 	void doRecommend();
 
 	// 读取字典、HMM参数、停用词典
@@ -88,8 +88,15 @@ public:
 	FilmInfo extractInfo(const char *htmlFile);
 	// 中文分词
 	CharStringLink divideWords(const CharString &passage, bool useHMM, bool useStopwords);
+	// 检索，返回电影id和关键字出现总次数
+	Vector<std::pair<int, int>> retrieve(const CharStringLink &keywords);
+	// 推荐，返回电影id和电影名
+	Vector<std::pair<int, CharString>> recommend(int docId, int topK);
 };
 
+// 将文件路径转化为 ANSI 编码
 extern void filePathCvtCode(char *filepath);
+// 读取电影解析结果文件
 extern void readFilmInfo(const char *file, FilmInfo &info);
+// 读取分词结果文件
 extern void readFilmWord(const char *file, CharStringLink &cuts);
