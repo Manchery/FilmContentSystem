@@ -10,7 +10,6 @@
 FilmContentSystemApplication::FilmContentSystemApplication()
 {
 	useHMM = useStopwords = false;
-	dicLoaded = false;
 	docCnt = 0;
 }
 
@@ -146,7 +145,7 @@ void FilmContentSystemApplication::loadDatabase()
 		}
 	}
 	_findclose(lf);
-	std::cerr << "Total " << docCnt << " files. " << std::endl;
+	std::cerr << "Loaded total " << docCnt << " files. " << std::endl;
 }
 
 void FilmContentSystemApplication::buildIndex()
@@ -198,9 +197,56 @@ Vector<std::pair<int, int>> FilmContentSystemApplication::retrieve(const CharStr
 	return res;
 }
 
-Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId)
+Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId, int topK)
 {
-	return Vector<std::pair<int, CharString>>();
+	FilmInfo info = filmInfos[docId];
+	struct data_t {
+		double score; int id;
+		bool operator < (const data_t &B) const {
+			return score == B.score ? id<B.id : score>B.score;
+		}
+		bool operator == (const data_t &B) const {
+			return id == B.id;
+		}
+	};
+	Vector<data_t> nodes;
+	int cap = topK * 1.5;
+	for (auto it = info.genres().begin(); it != info.genres().end(); ++it) {
+		CharString genre = *it;
+		TermInfo term = genreIndex.search(genre);
+		int cnt = 0;
+		for (auto p = term.list.begin(); cnt < cap && p != term.list.end(); ++p, ++cnt) {
+			if (p.id() == docId) continue;
+			FilmInfo target = filmInfos[p.id()];
+
+			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
+				+ intersectionSize(target.directors(), info.directors())
+				+ intersectionSize(target.stars(), info.stars(), 5)
+				+ intersectionSize(target.tags(), info.tags())
+				+ intersectionSize(target.regions(), info.regions());
+			
+			nodes.push_back(data_t{ score, p.id()});
+		}
+	}
+	nodes.sort();
+	nodes.unique();
+	Vector<std::pair<int, CharString>> res;
+	for (int i = 0; i < min(nodes.size(), topK); i++)
+		res.push_back(std::make_pair(nodes[i].id, filmInfos[nodes[i].id].name()));
+	
+	// 如果不足topK，随意补全
+	int ptr = 0;
+	while (res.size() < topK && ptr<docCnt) {
+		bool flag = 0;
+		for (int i = 0; i < res.size(); i++)
+			if (res[i].first == ptr) {
+				flag = 1; break;
+			}
+		if (!flag) res.push_back(std::make_pair(ptr, filmInfos[ptr].name()));
+		ptr++;
+	}
+
+	return res;
 }
 
 void FilmContentSystemApplication::doRetrieve()
@@ -242,18 +288,40 @@ void FilmContentSystemApplication::doRecommend()
 	std::wofstream wfout(recommOutput);
 	wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
+	const int MAXLEN = 1000;
+	wchar_t line[MAXLEN];
+	while (!wfin.eof()) {
+		wfin.getline(line, MAXLEN);
+		if (wcslen(line) == 0) continue;
+
+		if (!filmIdMap.find(line)) {
+			wfout << L"该电影不在数据库中，无法推荐" << std::endl;
+			continue;
+		}
+		int docId = filmIdMap[line];
+		Vector<std::pair<int, CharString>> res = recommend(docId, 10);
+
+		for (int i = 0; i < res.size(); i++) {
+			if (i) wfout << ' ';
+			wfout << '(' << res[i].first << ',' << res[i].second << ")";
+		}
+		wfout << std::endl;
+	}
+
 	wfin.close(); wfout.close();
 }
 
 void FilmContentSystemApplication::run(const char * configFile)
 {
 	loadConfig(configFile != nullptr ? configFile : DEFAULT_CONFIG_PATH);
-
+	if (!initDictionary(dictFile, hmmFile, stopwordsFile)) {
+		std::cerr << "Load dictionary failed !" << std::endl;
+		return;
+	}
 	loadDatabase();
-	
 	buildIndex();
-
 	doRetrieve();
+	doRecommend();
 }
 
 bool FilmContentSystemApplication::initDictionary(const char * dictFile, const char * hmmFile, const char *stopwordsFile)
@@ -262,7 +330,6 @@ bool FilmContentSystemApplication::initDictionary(const char * dictFile, const c
 		return false;
 	if (hmmFile) segmentor.loadHMM(hmmFile);
 	if (stopwordsFile) segmentor.loadStopwords(stopwordsFile);
-	dicLoaded = true;
 	return true;
 }
 
@@ -274,12 +341,6 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 
 CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
-	if (!dicLoaded) {
-		if (!initDictionary(dictFile, hmmFile, stopwordsFile)) {
-			std::cerr << "Load dictionary failed !" << std::endl;
-			return CharStringLink();
-		}
-	}
 	return segmentor.cut(passage, useHMM, useStopwords);
 }
 

@@ -117,5 +117,12 @@ public:
 	void sort() {
 		std::sort(_vector, _vector + _size);
 	}
+	void unique() {
+		int pnt = 0;
+		for (int i = 0; i < _size; i++)
+			if (i == 0 || !(_vector[i] == _vector[i - 1]))
+				_vector[pnt++] = _vector[i];
+		_size = pnt;
+	}
 };
 

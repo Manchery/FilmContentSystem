@@ -74,3 +74,5 @@ public:
 
 std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 
+int intersectionSize(const CharStringLink &a, const CharStringLink &b, int maxSize = -1);
+double IoU(const CharStringLink &a, const CharStringLink &b);
