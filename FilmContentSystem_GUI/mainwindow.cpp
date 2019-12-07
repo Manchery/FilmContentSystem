@@ -3,6 +3,7 @@
 #include "homepage.h"
 #include "retrievepage.h"
 #include "filmpage.h"
+#include "common_gui.h"
 #include <QTabBar>
 #include <QTabWidget>
 #include <QPushButton>
@@ -45,22 +46,15 @@ MainWindow::~MainWindow()
     delete app;
 }
 
-void MainWindow::retrieve(QString _keywords)
+void MainWindow::retrieve(QString keywords_raw)
 {
-    if (app->hasName(_keywords.toStdWString())){
-        int id = app->getIdFromName(_keywords.toStdWString());
-        auto filmTab = new FilmPage(app, tabs);
-        tabs->addTab(filmTab, _keywords);
-        tabs->setCurrentIndex(tabs->count()-1);
-        filmTab->setId(id);
+    if (app->hasName(keywords_raw.toStdWString())){
+        int id = app->getIdFromName(keywords_raw.toStdWString());
         CharStringLink words;
-        words.add(_keywords.toStdWString());
-        filmTab->setHighlight(words);
-        connect(filmTab, &FilmPage::filmChanged,
-                [this](QString name){ tabs->setTabText(tabs->currentIndex(),name);});
-
+        words.add(keywords_raw.toStdWString());
+        newFilmPage(id, words);
     }else{
-        QStringList splitted = _keywords.split(' ', QString::SkipEmptyParts);
+        QStringList splitted = keywords_raw.split(' ', QString::SkipEmptyParts);
         CharStringLink keywords;
         for (QString keyword: splitted){
             keywords.concat(app->divideWords(keyword.toStdWString(), app->getUseHMM(), app->getUseStopwords()));
@@ -69,14 +63,34 @@ void MainWindow::retrieve(QString _keywords)
             QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词"));
             return;
         }
-        auto retrieTab = new RetrievePage(app, tabs);
-        tabs->addTab(retrieTab, _keywords + QStringLiteral(" 的检索结果"));
-        tabs->setCurrentIndex(tabs->count()-1);
-        retrieTab->setText(_keywords);
-        retrieTab->retrieve(keywords);
-        connect(retrieTab, &RetrievePage::keywordsChanged,
-                [this](QString keywords){
-                    tabs->setTabText(tabs->currentIndex(),keywords + QStringLiteral(" 的检索结果"));
-        });
+        newRetrievePage(keywords_raw, keywords);
     }
+}
+
+void MainWindow::newFilmPage(int id, const CharStringLink &keywords)
+{
+    auto filmTab = new FilmPage(app, tabs);
+    tabs->addTab(filmTab, CharString2QString(app->getInfo(id).name()));
+    tabs->setCurrentIndex(tabs->count()-1);
+
+    filmTab->setId(id);
+    filmTab->setHighlight(keywords);
+    connect(filmTab, &FilmPage::filmChanged,
+            [this](QString name){ tabs->setTabText(tabs->currentIndex(),name);});
+}
+
+void MainWindow::newRetrievePage(QString keywords_raw, const CharStringLink &keywords)
+{
+    auto retrieTab = new RetrievePage(app, tabs);
+    tabs->addTab(retrieTab, keywords_raw + QStringLiteral(" 的检索结果"));
+    tabs->setCurrentIndex(tabs->count()-1);
+
+    retrieTab->setText(keywords_raw);
+    retrieTab->retrieve(keywords);
+
+    connect(retrieTab, &RetrievePage::keywordsChanged,
+            [this](QString keywords){
+                tabs->setTabText(tabs->currentIndex(),keywords + QStringLiteral(" 的检索结果"));
+    });
+    connect(retrieTab, &RetrievePage::filmClicked, this, &MainWindow::newFilmPage);
 }

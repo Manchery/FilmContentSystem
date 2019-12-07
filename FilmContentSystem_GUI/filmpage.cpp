@@ -67,18 +67,18 @@ void FilmPage::setId(int id)
             layout->addWidget(postLabel);
             postHeight=post.height();
             connect(postLabel, &ClickableLabel::clicked,
-                    [targetId, this](){ this->setId(targetId); });
+                    [targetId, this](){ setId(targetId); });
         }
 
         // 电影名
         auto *nameLabel = new ClickableLabel(item);
         nameLabel->setText(CharString2QString(app->getInfo(targetId).name()));
         connect(nameLabel, &ClickableLabel::clicked,
-                [targetId, this](){ this->setId(targetId); });
+                [targetId, this](){ setId(targetId); });
         nameLabel->setWordWrap(true);
 
         layout->addWidget(nameLabel);
-        maxHeight = std::max(maxHeight, postHeight+145);
+        maxHeight = std::max(maxHeight, postHeight+150);
     }
     ui->recommScrollArea->setMinimumHeight(maxHeight);
 

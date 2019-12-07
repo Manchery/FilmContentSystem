@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include "FilmContentSystemApplication.h"
@@ -22,11 +22,12 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-
     QTabWidget *tabs;
     HomePage *homeTab;
-
     FilmContentSystemApplication *app;
+
+    void newFilmPage(int id, const CharStringLink &keywords);
+    void newRetrievePage(QString keywords_raw, const CharStringLink &keywords);
 };
 
 #endif // MAINWINDOW_H

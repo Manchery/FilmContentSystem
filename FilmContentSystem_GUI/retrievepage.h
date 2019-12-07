@@ -5,6 +5,7 @@
 #include "FilmContentSystemApplication.h"
 #include <QWidget>
 #include <QVBoxLayout>
+#include <algorithm>
 
 namespace Ui {
 class RetrievePage;
@@ -20,6 +21,7 @@ public:
 
 signals:
     void keywordsChanged(QString keywords);
+    void filmClicked(int id, const CharStringLink &keywords);
 
 public slots:
     void retrieve(const CharStringLink& _keywords);
@@ -35,6 +37,9 @@ private:
     FilmContentSystemApplication* app;
     CharStringLink keywords;
     QVBoxLayout *resultLayout;
+
+    QWidget *retrieResultItem(std::pair<int, std::pair<int, int>> res);
+    QString abstract(const QString &text, const CharStringLink &keywords);
 };
 
 #endif // RETRIEVEPAGE_H
