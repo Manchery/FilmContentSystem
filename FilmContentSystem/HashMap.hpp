@@ -29,7 +29,7 @@ HashMap
 */
 
 // key_t, value_t: 键值类型; hashFunc: 哈希函数
-template<typename key_t, typename value_t, hash_t hashFunc(const key_t&) = charStringHash>
+template<typename key_t, typename value_t, hash_t hashFunc(const key_t&)>
 class HashMap
 {
 private:
