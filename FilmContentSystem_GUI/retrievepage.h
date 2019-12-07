@@ -1,4 +1,4 @@
-#ifndef RETRIEVEPAGE_H
+﻿#ifndef RETRIEVEPAGE_H
 #define RETRIEVEPAGE_H
 
 #include "CharStringLink.h"
@@ -26,7 +26,7 @@ private:
     Ui::RetrievePage *ui;
     const FilmContentSystemApplication* app;
     CharStringLink keywords;
-    QVBoxLayout *d_scroll_area_layout;
+    QVBoxLayout *resultLayout;
 };
 
 #endif // RETRIEVEPAGE_H

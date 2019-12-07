@@ -35,6 +35,7 @@ SOURCES += \
         ../FilmContentSystem/HtmlParser.cpp \
         ../FilmContentSystem/HtmlTag.cpp \
         ../FilmContentSystem/WordSegmentor.cpp \
+        clickablelabel.cpp \
         filmpage.cpp \
         homepage.cpp \
         main.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
 HEADERS += \
         ../FilmContentSystem/*.hpp \
         ../FilmContentSystem/*.h \
+    clickablelabel.h \
     filmpage.h \
         homepage.h \
         mainwindow.h \

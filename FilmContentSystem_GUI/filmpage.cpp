@@ -1,7 +1,17 @@
 ﻿#include "filmpage.h"
 #include "ui_filmpage.h"
+#include "clickablelabel.h"
 #include <QFile>
 #include <sstream>
+#include <QtDebug>
+#include <algorithm>
+#include <iostream>
+#include <QScrollArea>
+#include <QScrollBar>
+
+QString CharString2QString(const CharString & cstr){
+    return QString::fromStdWString(cstr.toWString());
+}
 
 FilmPage::FilmPage(const FilmContentSystemApplication *_app, QWidget *parent) :
     QWidget(parent),
@@ -10,6 +20,7 @@ FilmPage::FilmPage(const FilmContentSystemApplication *_app, QWidget *parent) :
     ui->setupUi(this);
     app = _app;
 //    ui->infoLabel->setWordWrap(true);
+    recommLayout = new QHBoxLayout(ui->scrollAreaWidget);
 }
 
 FilmPage::~FilmPage()
@@ -22,18 +33,71 @@ void FilmPage::setId(int id)
     // poster
     QString postPath = QString::fromStdWString(app->getInputDir()) + "/poster/" + QString::number(id)+".jpg";
     if (QFile::exists(postPath)){
-        QPixmap img(postPath);
-        ui->posterLabel->setPixmap(img);
+        ui->posterLabel->setPixmap(QPixmap(postPath));
     }else{
         ui->posterLabel->setVisible(false);
     }
-    //info
+
+    // info
     ui->infoLabel->setText(info2String(app->getInfo(id)));
+
+    // recommend
+    Vector<std::pair<int, CharString>> recomm = app->recommend(id, 10);
+
+    // 清空推荐列表
+    QLayoutItem *item;
+    while ((item = recommLayout->takeAt(0)) != nullptr){
+        delete item->widget(); delete item;
+    }
+
+    int maxHeight = 0; const double postScale = 0.6;
+    for (int i=0;i<recomm.size();i++){
+        int targetId = recomm[i].first;
+
+        QWidget *item = new QWidget(ui->scrollAreaWidget);
+        QVBoxLayout *layout = new QVBoxLayout(item);
+        recommLayout->addWidget(item);
+
+        // 电影海报
+        QString targetPost = QString::fromStdWString(app->getInputDir())
+                + "/poster/" + QString::number(targetId)+".jpg";
+        int postHeight=0;
+        if (QFile::exists(targetPost)){
+            auto *postLabel = new ClickableLabel(item);
+            QPixmap post(targetPost);
+            post = post.scaled(post.size()*postScale);
+            postLabel->setPixmap(post);
+            layout->addWidget(postLabel);
+            postHeight=post.height();
+            connect(postLabel, &ClickableLabel::clicked,
+                    [targetId, this](){ this->setId(targetId); });
+        }
+
+        // 电影名
+        auto *nameLabel = new ClickableLabel(item);
+        nameLabel->setText(CharString2QString(app->getInfo(targetId).name()));
+        connect(nameLabel, &ClickableLabel::clicked,
+                [targetId, this](){ this->setId(targetId); });
+        nameLabel->setWordWrap(true);
+
+        layout->addWidget(nameLabel);
+        maxHeight = std::max(maxHeight, postHeight+145);
+    }
+    ui->recommScrollArea->setMinimumHeight(maxHeight);
+
+    emit filmChanged(CharString2QString(app->getInfo(id).name()));
 }
 
-static QString CharString2QString(const CharString & cstr){
-    return QString::fromStdWString(cstr.toWString());
+void FilmPage::setHighlight(const CharStringLink &keywords)
+{
+    QString text = ui->infoLabel->toHtml();
+    for (auto p=keywords.begin();p!=keywords.end();++p){
+        QString word = CharString2QString(*p);
+        text.replace(word, "<span style=\"background-color: #FFFF00\">"+word+"</span>");
+    }
+    ui->infoLabel->setText(text);
 }
+
 
 QString info2String(const FilmInfo& info){
     QString res;

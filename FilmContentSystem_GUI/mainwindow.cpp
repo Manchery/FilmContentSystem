@@ -53,6 +53,12 @@ void MainWindow::retrieve(QString _keywords)
         tabs->addTab(filmTab, _keywords);
         tabs->setCurrentIndex(tabs->count()-1);
         filmTab->setId(id);
+        CharStringLink words;
+        words.add(_keywords.toStdWString());
+        filmTab->setHighlight(words);
+        connect(filmTab, &FilmPage::filmChanged,
+                [this](QString name){ tabs->setTabText(tabs->currentIndex(),name);});
+
     }else{
         QStringList splitted = _keywords.split(' ', QString::SkipEmptyParts);
         CharStringLink keywords;

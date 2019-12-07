@@ -1,4 +1,4 @@
-#include "retrievepage.h"
+﻿#include "retrievepage.h"
 #include "ui_retrievepage.h"
 #include <QPushButton>
 #include <QLabel>
@@ -13,15 +13,7 @@ RetrievePage::RetrievePage(const FilmContentSystemApplication *_app, QWidget *pa
 {
     app = _app;
     ui->setupUi(this);
-
-    auto scroll_area = new QScrollArea(this);
-    scroll_area->setWidgetResizable(true);
-    ui->verticalLayout->addWidget(scroll_area);
-
-    auto d_scroll_area_widget = new QWidget();
-    scroll_area->setWidget(d_scroll_area_widget);
-
-    d_scroll_area_layout = new QVBoxLayout(d_scroll_area_widget);
+    resultLayout = new QVBoxLayout(ui->scrollAreaWidget);
 }
 
 RetrievePage::~RetrievePage()
@@ -47,7 +39,7 @@ void RetrievePage::retrieve(const CharStringLink &_keywords)
     std::wcerr << std::endl;
     for (auto p = keywords.begin();p!=keywords.end();++p){
         QString word = QString::fromWCharArray((*p).toWString().c_str());
-        d_scroll_area_layout->addWidget(new QLabel(word,this));
+        resultLayout->addWidget(new QLabel(word,this));
     }
 }
 
