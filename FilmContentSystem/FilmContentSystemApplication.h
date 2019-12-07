@@ -88,8 +88,8 @@ public:
 	FilmInfo extractInfo(const char *htmlFile);
 	// 中文分词
 	CharStringLink divideWords(const CharString &passage, bool useHMM, bool useStopwords);
-	// 检索，返回电影id和关键字出现总次数
-	Vector<std::pair<int, int>> retrieve(const CharStringLink &keywords);
+	// 检索，返回电影id和关键词个数和关键字出现总次数
+	Vector<std::pair<int, std::pair<int, int>>> retrieve(const CharStringLink &keywords);
 	// 推荐，返回电影id和电影名
 	Vector<std::pair<int, CharString>> recommend(int docId, int topK);
 };

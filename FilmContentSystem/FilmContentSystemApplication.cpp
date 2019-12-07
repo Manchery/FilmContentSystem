@@ -165,7 +165,7 @@ void FilmContentSystemApplication::buildIndex()
 	}
 }
 
-Vector<std::pair<int, int>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords)
+Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords)
 {
 	using std::pair;
 	struct data_t {
@@ -191,9 +191,9 @@ Vector<std::pair<int, int>> FilmContentSystemApplication::retrieve(const CharStr
 		data_t aD = a.second ,bD = b.second;
 		return aD.cnt == bD.cnt ? aD.tot > bD.tot: aD.cnt > bD.cnt;
 	} });
-	Vector<pair<int, int>> res;
+	Vector<pair<int, pair<int, int>>> res;
 	for (int i = 0; i < nodes.size(); i++)
-		res.push_back(std::make_pair(nodes[i].first, nodes[i].second.tot));
+		res.push_back(std::make_pair(nodes[i].first, std::make_pair(nodes[i].second.cnt, nodes[i].second.tot)));
 	return res;
 }
 
@@ -270,11 +270,11 @@ void FilmContentSystemApplication::doRetrieve()
 			keywords.concat(divideWords(tmp, useHMM, useStopwords));
 		}
 
-		Vector<std::pair<int, int>> res = retrieve(keywords);
+		Vector<std::pair<int, std::pair<int, int>>> res = retrieve(keywords);
 		
 		for (int i = 0; i < res.size(); i++) {
 			if (i) wfout << ' ';
-			wfout << '(' << res[i].first << ',' << res[i].second << ")";
+			wfout << '(' << res[i].first << ',' << res[i].second.second << ")";
 		}
 		wfout << std::endl;
 	}
