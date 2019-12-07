@@ -130,9 +130,12 @@ QString info2String(const FilmInfo& info){
     if (!info.alternates().empty())
         res += QStringLiteral("<b>又名</b>: ")
                 + CharString2QString(info.alternates().toCharString()) + "<br>";
-    if (!info.introduction().empty())
+    if (!info.introduction().empty()){
+        QString intro = CharString2QString(info.introduction());
+        intro = intro.replace("\n","<br>&nbsp;&nbsp;&nbsp;");
         res += QStringLiteral("<br><b>剧情简介</b>: ") + "<br>&nbsp;&nbsp;&nbsp;"
-                + CharString2QString(info.introduction()).replace("\n","<br>&nbsp;&nbsp;&nbsp;") + "</p><br>";
+                + intro + "</p><br>";
+    }
 
     return res;
 }

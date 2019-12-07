@@ -168,6 +168,7 @@ CharString HtmlParser::postProcessTitle(const CharString & name)
 // 处理剧情简介，具体地，去除首尾空白字符，并将<br>转化为 '\n'
 CharString HtmlParser::postProcessSummary(const CharString & summary)
 {
+	// TODO: better process of spaces
 	CharString res; int len = summary.length();
 	for (int i = 0; i < len; i++) {
 		if (iswspace(summary[i])) continue;
