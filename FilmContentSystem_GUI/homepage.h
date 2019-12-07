@@ -1,4 +1,4 @@
-#ifndef HOMEPAGE_H
+﻿#ifndef HOMEPAGE_H
 #define HOMEPAGE_H
 
 #include <QWidget>
@@ -20,7 +20,6 @@ signals:
 
 private slots:
     void on_searchButton_clicked();
-
     void on_keywordEdit_returnPressed();
 
 private:

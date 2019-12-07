@@ -1,12 +1,15 @@
-#include "homepage.h"
+﻿#include "homepage.h"
 #include "ui_homepage.h"
 #include <QLineEdit>
+#include <QPixmap>
 
 HomePage::HomePage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::HomePage)
 {
     ui->setupUi(this);
+    QPixmap icon(":/icon/resource/icon.png");
+    ui->IconLabel->setPixmap(QPixmap(icon).scaled(icon.size()*0.5));
 }
 
 HomePage::~HomePage()

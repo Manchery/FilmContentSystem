@@ -20,9 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     tabs = ui->tabWidget;
 
-    tabs->addTab(homeTab = new HomePage(tabs), QStringLiteral("电影信息检索"));
+    auto homeTab = new HomePage(tabs);
+    tabs->addTab(homeTab, QStringLiteral("电影信息检索"));
     tabs->setTabsClosable(true);
     tabs->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
+
     connect(tabs, &QTabWidget::tabCloseRequested, this, [this](int idx){ tabs->removeTab(idx); });
     connect(homeTab, &HomePage::retrieveRequest, this, &MainWindow::retrieve);
 

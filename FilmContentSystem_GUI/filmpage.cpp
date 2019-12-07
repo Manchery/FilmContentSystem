@@ -72,7 +72,7 @@ void FilmPage::setId(int id)
 
         // 电影名
         auto *nameLabel = new ClickableLabel(item);
-        nameLabel->setText(CharString2QString(app->getInfo(targetId).name()));
+        nameLabel->setText("<font color=\"#3377aa\">"+CharString2QString(app->getInfo(targetId).name())+"</font>");
         nameLabel->setAlignment(Qt::AlignHCenter);
         connect(nameLabel, &ClickableLabel::clicked,
                 [targetId, this](){ setId(targetId); });

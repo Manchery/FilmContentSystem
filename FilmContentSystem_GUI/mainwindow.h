@@ -23,7 +23,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QTabWidget *tabs;
-    HomePage *homeTab;
     FilmContentSystemApplication *app;
 
     void newFilmPage(int id, const CharStringLink &keywords);
