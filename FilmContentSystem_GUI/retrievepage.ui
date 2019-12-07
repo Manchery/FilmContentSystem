@@ -29,6 +29,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="keywordsLabel">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -39,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>380</width>
-        <height>250</height>
+        <height>232</height>
        </rect>
       </property>
      </widget>

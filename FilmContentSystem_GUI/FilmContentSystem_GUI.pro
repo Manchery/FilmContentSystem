@@ -25,38 +25,40 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++14
 
 SOURCES += \
-        ../FilmContentSystem/CharString.cpp \
-        ../FilmContentSystem/CharStringLink.cpp \
-        ../FilmContentSystem/common.cpp \
-        ../FilmContentSystem/DocumentList.cpp \
-        ../FilmContentSystem/FileReader.cpp \
-        ../FilmContentSystem/FilmContentSystemApplication.cpp \
-        ../FilmContentSystem/FilmInfo.cpp \
-        ../FilmContentSystem/HtmlParser.cpp \
-        ../FilmContentSystem/HtmlTag.cpp \
-        ../FilmContentSystem/WordSegmentor.cpp \
-        clickablelabel.cpp \
-        filmpage.cpp \
-        homepage.cpp \
-        main.cpp \
-        mainwindow.cpp \  
-        retrievepage.cpp
+    ../FilmContentSystem/CharString.cpp \
+    ../FilmContentSystem/CharStringLink.cpp \
+    ../FilmContentSystem/common.cpp \
+    ../FilmContentSystem/DocumentList.cpp \
+    ../FilmContentSystem/FileReader.cpp \
+    ../FilmContentSystem/FilmContentSystemApplication.cpp \
+    ../FilmContentSystem/FilmInfo.cpp \
+    ../FilmContentSystem/HtmlParser.cpp \
+    ../FilmContentSystem/HtmlTag.cpp \
+    ../FilmContentSystem/WordSegmentor.cpp \
+    clickablelabel.cpp \
+    common_gui.cpp \
+    filmpage.cpp \
+    homepage.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    retrievepage.cpp
 
 HEADERS += \
-        ../FilmContentSystem/*.hpp \
-        ../FilmContentSystem/*.h \
+    ../FilmContentSystem/*.hpp \
+    ../FilmContentSystem/*.h \
     clickablelabel.h \
+    common_gui.h \
     filmpage.h \
-        homepage.h \
-        mainwindow.h \
-        retrievepage.h \
+    homepage.h \
+    mainwindow.h \
+    retrievepage.h \
 
 
 FORMS += \
-        filmpage.ui \
-        homepage.ui \
-        mainwindow.ui \
-        retrievepage.ui
+    filmpage.ui \
+    homepage.ui \
+    mainwindow.ui \
+    retrievepage.ui
 
 INCLUDEPATH += ../FilmContentSystem/
 

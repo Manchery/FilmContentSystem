@@ -1,4 +1,5 @@
-﻿#include "filmpage.h"
+﻿#include "common_gui.h"
+#include "filmpage.h"
 #include "ui_filmpage.h"
 #include "clickablelabel.h"
 #include <QFile>
@@ -8,10 +9,6 @@
 #include <iostream>
 #include <QScrollArea>
 #include <QScrollBar>
-
-QString CharString2QString(const CharString & cstr){
-    return QString::fromStdWString(cstr.toWString());
-}
 
 FilmPage::FilmPage(const FilmContentSystemApplication *_app, QWidget *parent) :
     QWidget(parent),

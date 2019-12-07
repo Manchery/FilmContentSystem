@@ -67,11 +67,16 @@ void MainWindow::retrieve(QString _keywords)
         }
         if (keywords.empty()){
             QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词"));
+            return;
         }
         auto retrieTab = new RetrievePage(app, tabs);
-        tabs->addTab(retrieTab, _keywords);
+        tabs->addTab(retrieTab, _keywords + QStringLiteral(" 的检索结果"));
         tabs->setCurrentIndex(tabs->count()-1);
         retrieTab->setText(_keywords);
         retrieTab->retrieve(keywords);
+        connect(retrieTab, &RetrievePage::keywordsChanged,
+                [this](QString keywords){
+                    tabs->setTabText(tabs->currentIndex(),keywords + QStringLiteral(" 的检索结果"));
+        });
     }
 }
