@@ -57,6 +57,7 @@ QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res
     auto nameLabel = new ClickableLabel(childItem);
     nameLabel->setText(CharString2QString(app->getInfo(id).name()));
     auto cntLabel = new QLabel(childItem);
+    cntLabel->setAlignment(Qt::AlignRight);
     cntLabel->setText(QStringLiteral("出现关键词: %1 个, 出现总数: %2 次").arg(
             QString::number(cnt), QString::number(tot)));
     auto ChildLayout = new QHBoxLayout(childItem);
