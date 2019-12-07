@@ -43,8 +43,13 @@ void RetrievePage::retrieve(const CharStringLink &_keywords)
 
     // 检索结果
     Vector<std::pair<int, std::pair<int, int>>> res = app->retrieve(keywords);
-    for (int i = 0; i < res.size(); i++)
-        resultLayout->addWidget(retrieResultItem(res[i]));
+    if (res.size()){
+        for (int i = 0; i < res.size(); i++)
+            resultLayout->addWidget(retrieResultItem(res[i]));
+    }else{
+        resultLayout->addWidget(new QLabel(QStringLiteral("未检索到相关结果"),
+                ui->scrollAreaWidget));
+    }
     resultLayout->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
