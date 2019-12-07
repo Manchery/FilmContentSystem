@@ -52,6 +52,12 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <family>SimSun-ExtB</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
           </widget>
          </item>
         </layout>

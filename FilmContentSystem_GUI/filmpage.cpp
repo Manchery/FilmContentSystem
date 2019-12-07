@@ -73,6 +73,7 @@ void FilmPage::setId(int id)
         // 电影名
         auto *nameLabel = new ClickableLabel(item);
         nameLabel->setText(CharString2QString(app->getInfo(targetId).name()));
+        nameLabel->setAlignment(Qt::AlignHCenter);
         connect(nameLabel, &ClickableLabel::clicked,
                 [targetId, this](){ setId(targetId); });
         nameLabel->setWordWrap(true);
@@ -130,8 +131,8 @@ QString info2String(const FilmInfo& info){
         res += QStringLiteral("<b>又名</b>: ")
                 + CharString2QString(info.alternates().toCharString()) + "<br>";
     if (!info.introduction().empty())
-        res += QStringLiteral("<b>剧情简介</b>: ") + "<br>"
-                + CharString2QString(info.introduction()) + "<br>";
+        res += QStringLiteral("<br><b>剧情简介</b>: ") + "<br>&nbsp;&nbsp;&nbsp;"
+                + CharString2QString(info.introduction()).replace("\n","<br>&nbsp;&nbsp;&nbsp;") + "</p><br>";
 
     return res;
 }

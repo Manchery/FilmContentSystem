@@ -45,20 +45,25 @@ void RetrievePage::retrieve(const CharStringLink &_keywords)
     Vector<std::pair<int, std::pair<int, int>>> res = app->retrieve(keywords);
     for (int i = 0; i < res.size(); i++)
         resultLayout->addWidget(retrieResultItem(res[i]));
+    resultLayout->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
 QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res)
 {
     int id = res.first, cnt = res.second.first, tot = res.second.second;
 
-    auto item = new QWidget(ui->scrollAreaWidget);
+    auto superItem = new QWidget(ui->scrollAreaWidget);
+    auto superLayout = new QHBoxLayout(superItem);
+
+    auto item = new QWidget(superItem);
     auto childItem = new QWidget(item);
 
     auto nameLabel = new ClickableLabel(childItem);
-    nameLabel->setText(CharString2QString(app->getInfo(id).name()));
+    nameLabel->setText("<font color=\"#1a0dab\"><big><u>"+CharString2QString(app->getInfo(id).name())+"</u></big></font>");
     auto cntLabel = new QLabel(childItem);
     cntLabel->setAlignment(Qt::AlignRight);
-    cntLabel->setText(QStringLiteral("出现关键词: %1 个, 出现总数: %2 次").arg(
+    cntLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    cntLabel->setText(QStringLiteral("<font color=\"#70757a\"><small>出现关键词: %1 个, 出现总数: %2 次</small></font>").arg(
             QString::number(cnt), QString::number(tot)));
     auto ChildLayout = new QHBoxLayout(childItem);
     ChildLayout->addWidget(nameLabel); ChildLayout->addWidget(cntLabel);
@@ -70,11 +75,20 @@ QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res
     auto layout = new QVBoxLayout(item);
     layout->addWidget(childItem); layout->addWidget(absLabel);
 
+    auto *postLabel = new QLabel(item);
+    QString targetPost = QString::fromStdWString(app->getInputDir())
+            + "/poster/" + QString::number(id)+".jpg";
+    QPixmap post(targetPost);
+    postLabel->setPixmap(post.scaled(post.size()*0.4));
+
+    superLayout->addWidget(postLabel);
+    superLayout->addWidget(item);
+
     connect(nameLabel, &ClickableLabel::clicked, [id, this](){
         emit filmClicked(id, keywords);
     });
 
-    return item;
+    return superItem;
 }
 
 QString RetrievePage::abstract(const QString &text, const CharStringLink &keywords)
@@ -102,9 +116,10 @@ QString RetrievePage::abstract(const QString &text, const CharStringLink &keywor
             abs+="...";
     }
     if (!abs.endsWith("...")) abs += "...";
+    abs.replace("\n", "");
     for (auto p=keywords.begin();p!=keywords.end();++p){
         QString word = CharString2QString(*p);
-        abs.replace(word, "<span style=\"background-color: #FFFF00\">"+word+"</span>");
+        abs.replace(word, "<font color=\"#dd4b39\">"+word+"</font>");
     }
     return abs;
 }

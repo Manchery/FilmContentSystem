@@ -216,7 +216,7 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 		TermInfo term = genreIndex.search(genre);
 		int cnt = 0;
 		for (auto p = term.list.begin(); cnt < cap && p != term.list.end(); ++p, ++cnt) {
-			if (p.id() == docId) continue;
+			if (filmInfos[p.id()].name() == filmInfos[docId].name()) continue;
 			FilmInfo target = filmInfos[p.id()];
 
 			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
