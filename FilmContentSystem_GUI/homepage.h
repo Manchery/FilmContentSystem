@@ -21,6 +21,8 @@ signals:
 private slots:
     void on_searchButton_clicked();
 
+    void on_keywordEdit_returnPressed();
+
 private:
     Ui::HomePage *ui;
 };

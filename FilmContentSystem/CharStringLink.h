@@ -69,6 +69,8 @@ public:
 	CharString& front() { return head->str; }
 	CharString& back() { return tail->str; }
 
+	CharString toCharString() const;
+
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
 

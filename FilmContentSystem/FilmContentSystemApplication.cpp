@@ -165,7 +165,7 @@ void FilmContentSystemApplication::buildIndex()
 	}
 }
 
-Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords)
+Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords) const
 {
 	using std::pair;
 	struct data_t {
@@ -197,7 +197,7 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 	return res;
 }
 
-Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId, int topK)
+Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId, int topK) const
 {
 	FilmInfo info = filmInfos[docId];
 	struct data_t {
@@ -210,7 +210,7 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 		}
 	};
 	Vector<data_t> nodes;
-	int cap = topK * 1.5;
+	int cap = static_cast<int>(topK * 1.5);
 	for (auto it = info.genres().begin(); it != info.genres().end(); ++it) {
 		CharString genre = *it;
 		TermInfo term = genreIndex.search(genre);
@@ -311,7 +311,6 @@ void FilmContentSystemApplication::doRecommend()
 	wfin.close(); wfout.close();
 }
 
-
 bool FilmContentSystemApplication::init(const char * configFile)
 {
 	loadConfig(configFile != nullptr ? configFile : DEFAULT_CONFIG_PATH);
@@ -348,6 +347,12 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
 	return segmentor.cut(passage, useHMM, useStopwords);
+}
+
+std::wstring FilmContentSystemApplication::getInputDir() const {
+	wchar_t tmp[MAX_FLAG_LEN];
+	MultiByteToWideChar(CP_ACP, 0, inputDir, -1, tmp, MAX_FLAG_LEN);
+	return std::wstring(tmp);
 }
 
 
@@ -430,3 +435,4 @@ void readFilmWord(const char *file, CharStringLink & cuts)
 	}
 	wfin.close();
 }
+

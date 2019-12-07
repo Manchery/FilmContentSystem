@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <iostream>
+#include <string>
 
 /*
 CharString
@@ -58,6 +59,9 @@ public:
 
 	// 将字符串的值转化为double
 	double toDouble() const;
+
+	// 转化为wstring
+	std::wstring toWString() const;
 
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
 	friend std::wostream & operator << (std::wostream & os, const CharString &str);

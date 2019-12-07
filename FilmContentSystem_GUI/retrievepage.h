@@ -1,7 +1,10 @@
 #ifndef RETRIEVEPAGE_H
 #define RETRIEVEPAGE_H
 
+#include "CharStringLink.h"
+#include "FilmContentSystemApplication.h"
 #include <QWidget>
+#include <QVBoxLayout>
 
 namespace Ui {
 class RetrievePage;
@@ -12,11 +15,18 @@ class RetrievePage : public QWidget
     Q_OBJECT
 
 public:
-    explicit RetrievePage(QWidget *parent = nullptr);
+    explicit RetrievePage(const FilmContentSystemApplication *_app, QWidget *parent = nullptr);
     ~RetrievePage();
+
+public slots:
+    void retrieve(const CharStringLink& _keywords);
+    void setText(QString text);
 
 private:
     Ui::RetrievePage *ui;
+    const FilmContentSystemApplication* app;
+    CharStringLink keywords;
+    QVBoxLayout *d_scroll_area_layout;
 };
 
 #endif // RETRIEVEPAGE_H

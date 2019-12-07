@@ -1,7 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>RetrievePage</class>
  <widget class="QWidget" name="RetrievePage">
   <property name="geometry">
@@ -15,7 +13,27 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="keywordsEdit"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="searchButton">
+         <property name="text">
+          <string>搜索</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>

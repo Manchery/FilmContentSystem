@@ -91,9 +91,17 @@ public:
 	// 中文分词
 	CharStringLink divideWords(const CharString &passage, bool useHMM, bool useStopwords);
 	// 检索，返回电影id和关键词个数和关键字出现总次数
-	Vector<std::pair<int, std::pair<int, int>>> retrieve(const CharStringLink &keywords);
+	Vector<std::pair<int, std::pair<int, int>>> retrieve(const CharStringLink &keywords) const;
 	// 推荐，返回电影id和电影名
-	Vector<std::pair<int, CharString>> recommend(int docId, int topK);
+	Vector<std::pair<int, CharString>> recommend(int docId, int topK) const;
+
+	// 给 GUI 提供的查询接口
+	bool getUseHMM() const { return useHMM; }
+	bool getUseStopwords() const { return useStopwords; }
+	bool hasName(const CharString &name) const { return filmIdMap.find(name); }
+	int getIdFromName(const CharString& name) const { return filmIdMap.at(name); }
+	const FilmInfo& getInfo(int idx) const { return filmInfos[idx]; }
+	std::wstring getInputDir() const;
 };
 
 // 将文件路径转化为 ANSI 编码

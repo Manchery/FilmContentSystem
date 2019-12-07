@@ -43,9 +43,9 @@ public:
 		term.DF++; term.occur++;
 		term.list.add(docId, rating);
 	}
-	TermInfo search(const CharString &word) {
+	TermInfo search(const CharString &word) const {
 		if (index.find(word))
-			return index[word];
+			return index.at(word);
 		else
 			return TermInfo();
 	}

@@ -47,7 +47,12 @@ public:
 			result = newNode(key, data_t()), insert(result);
 		return result->data;
 	}
-	bool find(const key_t &key) {
+	data_t at(const key_t &key) const {
+		node *result = findNode(key);
+		if (result == null) return data_t();
+		return result->data;
+	}
+	bool find(const key_t &key) const {
 		return findNode(key) != nullptr;
 	}
 	Vector<std::pair<key_t, data_t>> list() {
@@ -111,7 +116,7 @@ protected:
 				rotate(x->ch[1]);
 		x->p->ch[x->direction()] = null; x->p->update(); splay(root, x->p);
 	}
-	node *findNode(const key_t &key) {
+	node *findNode(const key_t &key) const {
 		node *x = root;
 		while (x != null) {
 			if (x->key == key) return x;
@@ -120,7 +125,7 @@ protected:
 		}
 		return null;
 	}
-	void _list(Vector<std::pair<key_t, data_t>> &vec, node *x) {
+	void _list(Vector<std::pair<key_t, data_t>> &vec, node *x) const {
 		if (x == null) return;
 		_list(vec, x->ch[0]);
 		vec.push_back(std::make_pair(x->key, x->data));

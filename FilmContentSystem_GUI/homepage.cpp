@@ -1,5 +1,6 @@
 #include "homepage.h"
 #include "ui_homepage.h"
+#include <QLineEdit>
 
 HomePage::HomePage(QWidget *parent) :
     QWidget(parent),
@@ -14,6 +15,11 @@ HomePage::~HomePage()
 }
 
 void HomePage::on_searchButton_clicked()
+{
+    emit retrieveRequest(ui->keywordEdit->text());
+}
+
+void HomePage::on_keywordEdit_returnPressed()
 {
     emit retrieveRequest(ui->keywordEdit->text());
 }

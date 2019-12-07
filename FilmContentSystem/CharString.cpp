@@ -126,6 +126,13 @@ double CharString::toDouble() const
 	return result;
 }
 
+std::wstring CharString::toWString() const
+{
+	std::wstring res;
+	for (int i = 0; i < _len; i++) res += _str[i];
+	return res;
+}
+
 CharString& CharString::assign(const CharString & b)
 {
 	if (b._len > _capacity) {

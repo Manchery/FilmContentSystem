@@ -91,6 +91,16 @@ void CharStringLink::concat(const CharStringLink & b)
 	}
 }
 
+CharString CharStringLink::toCharString() const
+{
+	CharString res;
+	for (auto it = begin(); it != end(); ++it) {
+		if (it != begin()) res += L" / ";
+		res += *it;
+	}
+	return res;
+}
+
 std::wostream & operator<<(std::wostream & os, const CharStringLink & str)
 {
 	for (auto it = str.begin(); it != str.end(); ++it) {
