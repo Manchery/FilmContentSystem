@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++14
 
 SOURCES += \
+        homepage.cpp \
         main.cpp \
         mainwindow.cpp \
         ../FilmContentSystem/CharString.cpp \
@@ -36,15 +37,20 @@ SOURCES += \
         ../FilmContentSystem/FilmInfo.cpp \
         ../FilmContentSystem/HtmlParser.cpp \
         ../FilmContentSystem/HtmlTag.cpp \
-        ../FilmContentSystem/WordSegmentor.cpp \
+        ../FilmContentSystem/WordSegmentor.cpp \ \
+    retrievepage.cpp
 
 HEADERS += \
+        homepage.h \
         mainwindow.h \
         ../FilmContentSystem/*.hpp \
-        ../FilmContentSystem/*.h
+        ../FilmContentSystem/*.h \
+        retrievepage.h
 
 FORMS += \
-        mainwindow.ui
+        homepage.ui \
+        mainwindow.ui \
+        retrievepage.ui
 
 INCLUDEPATH += ../FilmContentSystem/
 

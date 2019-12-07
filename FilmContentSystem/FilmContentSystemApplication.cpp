@@ -311,15 +311,22 @@ void FilmContentSystemApplication::doRecommend()
 	wfin.close(); wfout.close();
 }
 
-void FilmContentSystemApplication::run(const char * configFile)
+
+bool FilmContentSystemApplication::init(const char * configFile)
 {
 	loadConfig(configFile != nullptr ? configFile : DEFAULT_CONFIG_PATH);
 	if (!initDictionary(dictFile, hmmFile, stopwordsFile)) {
 		std::cerr << "Load dictionary failed !" << std::endl;
-		return;
+		return false;
 	}
 	loadDatabase();
 	buildIndex();
+	return true;
+}
+
+void FilmContentSystemApplication::run(const char * configFile)
+{
+	if (!init(configFile)) return;
 	doRetrieve();
 	doRecommend();
 }

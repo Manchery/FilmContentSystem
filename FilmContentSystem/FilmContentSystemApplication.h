@@ -69,6 +69,8 @@ public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();
 
+	bool init(const char *configFile = nullptr);
+
 	void run(const char *configFile = nullptr);
 
 	// 读取 config，要求config文件采用 UTF-8 编码
