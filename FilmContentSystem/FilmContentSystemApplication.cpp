@@ -103,7 +103,7 @@ void FilmContentSystemApplication::loadDatabase()
 			if (!endsWith(file.name, ".html"))
 				continue;
 
-			// std::cerr << "Found file " << file.name << "..." << std::endl;
+			//std::cerr << "Found file " << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
 			strncpy_s(baseName, file.name, strlen(file.name) - 5);
@@ -401,10 +401,10 @@ void readFilmInfo(const char *file, FilmInfo & info)
 			wfin >> info._rating;
 		}
 		else if (buf == L"¾çÇé¼ò½é:") {
-			wchar_t line[1000];
-			wfin.getline(line, 1000);
+			const int MAXLEN = 5000; wchar_t line[MAXLEN];
+			wfin.getline(line, MAXLEN);
 			while (!wfin.eof()) {
-				wfin.getline(line, 1000);
+				wfin.getline(line, MAXLEN);
 				if (wcslen(line) == 0) continue;
 				if (!info._introduction.empty()) info._introduction += L"\n";
 				info._introduction += line;

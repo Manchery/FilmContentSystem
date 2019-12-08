@@ -74,7 +74,7 @@
           </font>
          </property>
          <property name="text">
-          <string>推荐</string>
+          <string>推荐 &lt;small&gt;（点击可跳转）&lt;/small&gt;</string>
          </property>
         </widget>
        </item>

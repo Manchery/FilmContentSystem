@@ -38,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
     std::cerr<< appConfig.toStdString().c_str() << std::endl;
     if (!app->init(appConfig.toStdString().c_str())){
         throw std::exception("Database init failed !");
+    }else{
+        std::cerr<< "Load Database success !" << std::endl;
     }
 
 }

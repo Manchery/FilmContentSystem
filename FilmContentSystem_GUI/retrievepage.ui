@@ -49,10 +49,17 @@
         <x>0</x>
         <y>0</y>
         <width>380</width>
-        <height>232</height>
+        <height>214</height>
        </rect>
       </property>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="noticeLabel">
+     <property name="text">
+      <string>关键词出现次数由分词结果统计，与直接匹配结果可能不同。</string>
+     </property>
     </widget>
    </item>
   </layout>
