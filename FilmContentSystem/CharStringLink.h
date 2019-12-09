@@ -66,8 +66,16 @@ public:
 	void concat(const CharStringLink &b);
 	bool empty() const { return head == nullptr; }
 
+	CharString& front() { return head->str; }
+	CharString& back() { return tail->str; }
+
+	// 转化为 CharString，元素间用 " / " 分隔
+	CharString toCharString() const;
+
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
 
 std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 
+int intersectionSize(const CharStringLink &a, const CharStringLink &b, int maxSize = -1);
+double IoU(const CharStringLink &a, const CharStringLink &b);

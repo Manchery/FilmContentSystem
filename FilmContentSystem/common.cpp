@@ -1,5 +1,6 @@
-# include "common.h"
-# include "CharString.h"
+#include "common.h"
+#include "CharString.h"
+#include <cstring> 
 
 bool isLower(wchar_t w) { return 'a' <= w && w <= 'z'; }
 bool isUpper(wchar_t w) { return 'A' <= w && w <= 'Z'; }

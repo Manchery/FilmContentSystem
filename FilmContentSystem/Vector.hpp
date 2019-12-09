@@ -78,6 +78,10 @@ public:
 			_capacity = cap;
 		}
 	}
+	void resize(int siz) {
+		reserve(siz);
+		_size = siz;
+	}
 	void push_back(const value_t & item) {
 		if (_capacity == 0 || _size == _capacity) {
 			// 如果当前容量不足，将容量翻倍，该操作的均摊复杂度为 O(1)
@@ -105,6 +109,24 @@ public:
 	}
 	bool empty() const {
 		return _size == 0;
+	}
+	
+	// 按照给定的比较函数排序
+	typedef bool (*cmpFunc)(const value_t&, const value_t&);
+	void sort(cmpFunc cmp) {
+		std::sort(_vector, _vector + _size, cmp);
+	}
+	// 按照默认顺序排序
+	void sort() {
+		std::sort(_vector, _vector + _size);
+	}
+	// 去重，要求有序
+	void unique() {
+		int pnt = 0;
+		for (int i = 0; i < _size; i++)
+			if (i == 0 || !(_vector[i] == _vector[i - 1]))
+				_vector[pnt++] = _vector[i];
+		_size = pnt;
 	}
 };
 

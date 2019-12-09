@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <iostream>
+#include <string>
 
 /*
 CharString
@@ -56,10 +57,17 @@ public:
 	// 子串查找，返回第一次出现的位置，使用KMP算法
 	int indexOf(const CharString &b) const;
 
+	// 将字符串的值转化为double
+	double toDouble() const;
+
+	// 转化为wstring
+	std::wstring toWString() const;
+
 	friend std::wistream & operator >> (std::wistream & is, CharString &str);
 	friend std::wostream & operator << (std::wostream & os, const CharString &str);
 	friend CharString concat(const CharString &a, const CharString &b);
 	friend bool operator==(const CharString &a, const CharString &b);
+	friend bool operator<(const CharString &a, const CharString &b);
 };
 
 std::wistream & operator >> (std::wistream & is, CharString &str);
@@ -67,6 +75,7 @@ std::wostream & operator << (std::wostream & os, const CharString &str);
 CharString concat(const CharString &a, const CharString &b);
 CharString operator + (const CharString &a, const CharString &b);
 bool operator==(const CharString &a, const CharString &b);
+bool operator<(const CharString &a, const CharString &b);
 
 // hash函数
 hash_t charStringHash(const CharString& str);

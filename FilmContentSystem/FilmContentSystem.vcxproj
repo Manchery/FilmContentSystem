@@ -123,14 +123,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BalancedBST.hpp" />
     <ClInclude Include="CharString.h" />
     <ClInclude Include="CharStringLink.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="DocumentList.h" />
     <ClInclude Include="FilmContentSystemApplication.h" />
     <ClInclude Include="FilmInfo.h" />
     <ClInclude Include="HashMap.hpp" />
     <ClInclude Include="HtmlParser.h" />
     <ClInclude Include="HtmlTag.h" />
+    <ClInclude Include="InvertedIndex.hpp" />
     <ClInclude Include="Stack.hpp" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Vector.hpp" />
@@ -140,6 +143,7 @@
     <ClCompile Include="CharString.cpp" />
     <ClCompile Include="CharStringLink.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="DocumentList.cpp" />
     <ClCompile Include="FilmContentSystemApplication.cpp" />
     <ClCompile Include="FilmContentSystemMain.cpp" />
     <ClCompile Include="FilmInfo.cpp" />

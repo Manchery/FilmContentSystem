@@ -37,3 +37,11 @@ bool HtmlTag::hasAttribute(const CharString & key, const CharString & value) con
 			return true;
 	return false;
 }
+
+CharString HtmlTag::attributeValue(const CharString & key) const
+{
+	for (int i = 0; i < _attr.size(); i++)
+		if (_attr[i].key() == key)
+			return _attr[i].value();
+	return CharString();
+}

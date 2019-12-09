@@ -21,6 +21,8 @@ private:
 	CharString _name, _introduction;
 	// 导演、编剧、主演、类型、地区、语言、上映日期、时长、又名
 	CharStringLink _directors, _screenwriters, _stars, _genres, _regions, _languages, _dates, _durations, _alternates;
+	CharStringLink _tags;	// 标签
+	double _rating;			// 评分
 
 public:
 	FilmInfo();
@@ -36,6 +38,8 @@ public:
 	const CharStringLink& dates() const { return _dates; }
 	const CharStringLink& durations() const { return _durations; }
 	const CharStringLink& alternates() const { return _alternates; }
+	const CharStringLink& tags() const { return _tags; }
+	double rating() const { return _rating; }
 
 	void setName(const CharString& name) { _name = name; }
 	void setIntroduction(const CharString& introduction) { _introduction = introduction; }
@@ -48,8 +52,11 @@ public:
 	void addDate(const CharString& x) { _dates.add(x); }
 	void addDuration(const CharString& x) { _durations.add(x); }
 	void addAlternate(const CharString& x) { _alternates.add(x); }
+	void addTag(const CharString& x) { _tags.add(x); }
+	void setRating(double rating) { _rating = rating; }
 
 	friend std::wostream & operator<<(std::wostream & os, const FilmInfo & info);
+	friend void readFilmInfo(const char *file, FilmInfo &info);
 };
 
 extern std::wostream & operator<<(std::wostream & os, const FilmInfo & info);

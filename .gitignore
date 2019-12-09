@@ -260,5 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 
-# Project
-movie-scraper/movies
+# Qt
+build-FilmContentSystem_GUI-*

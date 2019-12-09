@@ -91,6 +91,16 @@ void CharStringLink::concat(const CharStringLink & b)
 	}
 }
 
+CharString CharStringLink::toCharString() const
+{
+	CharString res;
+	for (auto it = begin(); it != end(); ++it) {
+		if (it != begin()) res += L" / ";
+		res += *it;
+	}
+	return res;
+}
+
 std::wostream & operator<<(std::wostream & os, const CharStringLink & str)
 {
 	for (auto it = str.begin(); it != str.end(); ++it) {
@@ -98,4 +108,35 @@ std::wostream & operator<<(std::wostream & os, const CharStringLink & str)
 		os << *it;
 	}
 	return os;
+}
+
+int intersectionSize(const CharStringLink & a, const CharStringLink & b, int maxSize)
+{
+	int res = 0; int cntA = 0;
+	for (auto i = a.begin(); i != a.end() && cntA != maxSize; ++i, ++cntA) {
+		int cntB = 0;
+		for (auto j = b.begin(); j != b.end() && cntB != maxSize; ++j, ++cntB)
+			if (*i == *j) {
+				res++;
+				break;
+			}
+	}
+	return res;
+}
+
+double IoU(const CharStringLink & a, const CharStringLink & b)
+{
+	int sizeA = 0, sizeB = 0;
+	int inter = 0;
+	for (auto j = b.begin(); j != b.end(); ++j) sizeB++;
+	for (auto i = a.begin(); i != a.end(); ++i) {
+		sizeA++;
+		for (auto j = b.begin(); j != b.end(); ++j)
+			if (*i == *j) {
+				inter++;
+				break;
+			}
+	}
+	int unin = sizeA + sizeB - inter;
+	return (double)inter / unin;
 }

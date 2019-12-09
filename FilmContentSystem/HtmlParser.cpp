@@ -170,9 +170,17 @@ CharString HtmlParser::postProcessSummary(const CharString & summary)
 {
 	CharString res; int len = summary.length();
 	for (int i = 0; i < len; i++) {
-		if (iswspace(summary[i])) continue;
-		if (i + 3 < len && summary.substring(i, i + 4) == L"<br>")
+		if (iswspace(summary[i])){
+			int j = i; 
+			while (j + 1 < len && iswspace(summary[j + 1])) j++;
+			if (!(i==0 || j==len-1 || (isHan(summary[i-1]) && isHan(summary[j+1]) && summary[j+1]!=L'ÊÎ' && summary[j+1]!=L'Òô')))
+				res += ' ';
+			i = j; continue;
+		}
+		if (i + 3 < len && summary.substring(i, i + 4) == L"<br>") {
 			res += '\n', i += 4;
+			while (i + 1 < len && iswspace(summary[i + 1])) i++;
+		}
 		else 
 			res += summary[i];
 	}
@@ -226,6 +234,13 @@ void HtmlParser::postProcessTag(const HtmlTag & tag, FilmInfo & info)
 	}
 	else if (tag.hasAttribute(L"property", L"v:summary") || tag.hasAttribute(L"class", L"all hidden")) {
 		info.setIntroduction(postProcessSummary(tag.content()));
+	}
+	else if (tag.type() == L"a" && tag.hasAttribute(L"href") 
+		&& tag.attributeValue(L"href").length()>5 && tag.attributeValue(L"href").substring(0, 5) == L"/tag/") {
+		info.addTag(tag.content());
+	}
+	else if (tag.type() == L"strong" && tag.hasAttribute(L"class", L"ll rating_num")) {
+		info.setRating(tag.content().toDouble());
 	}
 }
 

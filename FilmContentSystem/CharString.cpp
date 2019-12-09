@@ -1,4 +1,5 @@
 #include "CharString.h"
+#include "common.h"
 #include <stdexcept>
 #include <cstring>
 #include <string>
@@ -114,6 +115,24 @@ int CharString::indexOf(const CharString & b) const
 	return ans;
 }
 
+double CharString::toDouble() const
+{
+	double result = 0; int i;
+	for (i = 0; i < _len && _str[i] != '.'; i++)
+		result = result * 10 + _str[i] - '0';
+	double base = 1;
+	for (i++; i < _len; i++)
+		base *= 0.1, result += base * (_str[i] - '0');
+	return result;
+}
+
+std::wstring CharString::toWString() const
+{
+	std::wstring res;
+	for (int i = 0; i < _len; i++) res += _str[i];
+	return res;
+}
+
 CharString& CharString::assign(const CharString & b)
 {
 	if (b._len > _capacity) {
@@ -203,6 +222,20 @@ bool operator==(const CharString & a, const CharString & b)
 		if (a[i] != b[i]) 
 			return false;
 	return true;
+}
+
+bool operator<(const CharString & a, const CharString & b)
+{
+	for (int i = 0; i < Max(a.length(), b.length()); i++)
+		if (i >= b.length())
+			return false;
+		else if (i >= a.length())
+			return true;
+		else if (a[i] < b[i])
+			return true;
+		else if (a[i] > b[i])
+			return false;
+	return false;
 }
 
 hash_t charStringHash(const CharString & str) {
