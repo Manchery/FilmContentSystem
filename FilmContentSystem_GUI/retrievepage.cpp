@@ -55,6 +55,11 @@ void RetrievePage::retrieve(const CharStringLink &_keywords)
 
 QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res)
 {
+    // 结构：
+    // superItem(superLayout): postLabel + item
+    // item(layout): childItem + absLabel
+    // childItem(childLayout): nameLabel+cntLabel
+
     int id = res.first, cnt = res.second.first, tot = res.second.second;
 
     auto superItem = new QWidget(ui->scrollAreaWidget);
@@ -70,8 +75,8 @@ QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res
     cntLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     cntLabel->setText(QStringLiteral("<font color=\"#70757a\"><small>出现关键词: %1 个, 出现总数: %2 次</small></font>").arg(
             QString::number(cnt), QString::number(tot)));
-    auto ChildLayout = new QHBoxLayout(childItem);
-    ChildLayout->addWidget(nameLabel); ChildLayout->addWidget(cntLabel);
+    auto childLayout = new QHBoxLayout(childItem);
+    childLayout->addWidget(nameLabel); childLayout->addWidget(cntLabel);
 
     auto absLabel = new QLabel(item);
     absLabel->setText(abstract(
@@ -143,7 +148,7 @@ void RetrievePage::on_searchButton_clicked()
         keywords.concat(app->divideWords(keyword.toStdWString(), app->getUseHMM(), app->getUseStopwords()));
     }
     if (keywords.empty()){
-        QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词"));
+        QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词（非停用词）"));
         return;
     }
     setText(keywords_raw);

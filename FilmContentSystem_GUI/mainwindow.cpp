@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     auto homeTab = new HomePage(tabs);
     tabs->addTab(homeTab, QStringLiteral("电影信息检索"));
     tabs->setTabsClosable(true);
+    // homeTab 不可被关闭
     tabs->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 
     connect(tabs, &QTabWidget::tabCloseRequested, this, [this](int idx){ tabs->removeTab(idx); });
@@ -53,6 +54,7 @@ MainWindow::~MainWindow()
 void MainWindow::retrieve(QString keywords_raw)
 {
     if (app->hasName(keywords_raw.toStdWString())){
+        // 主页检索的关键字与电影名完美匹配
         int id = app->getIdFromName(keywords_raw.toStdWString());
         CharStringLink words;
         words.add(keywords_raw.toStdWString());
@@ -64,7 +66,7 @@ void MainWindow::retrieve(QString keywords_raw)
             keywords.concat(app->divideWords(keyword.toStdWString(), app->getUseHMM(), app->getUseStopwords()));
         }
         if (keywords.empty()){
-            QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词"));
+            QMessageBox::warning(this, QStringLiteral("关键词不足"), QStringLiteral("请输入更多的关键词（非停用词）"));
             return;
         }
         newRetrievePage(keywords_raw, keywords);

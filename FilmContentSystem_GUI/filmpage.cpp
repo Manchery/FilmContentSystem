@@ -3,12 +3,9 @@
 #include "ui_filmpage.h"
 #include "clickablelabel.h"
 #include <QFile>
-#include <sstream>
-#include <QtDebug>
-#include <algorithm>
-#include <iostream>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <algorithm>
 
 FilmPage::FilmPage(const FilmContentSystemApplication *_app, QWidget *parent) :
     QWidget(parent),
@@ -96,7 +93,7 @@ void FilmPage::setHighlight(const CharStringLink &keywords)
     ui->infoLabel->setText(text);
 }
 
-
+// 将 FilmInfo 类型转换成 html 格式的文本
 QString info2String(const FilmInfo& info){
     QString res;
     res += "<big><span>" +CharString2QString(info.name())+ "</span></big><br>";

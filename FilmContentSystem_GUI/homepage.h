@@ -3,6 +3,11 @@
 
 #include <QWidget>
 
+/* HomePage
+ * 说明：检索界面主页，主要由输入框和检索按钮组成
+ *      当输入时按下回车或者点击按钮，发出 retrieveRequest 信号
+ */
+
 namespace Ui {
 class HomePage;
 }
