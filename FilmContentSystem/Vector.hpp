@@ -110,13 +110,17 @@ public:
 	bool empty() const {
 		return _size == 0;
 	}
+	
+	// 按照给定的比较函数排序
 	typedef bool (*cmpFunc)(const value_t&, const value_t&);
 	void sort(cmpFunc cmp) {
 		std::sort(_vector, _vector + _size, cmp);
 	}
+	// 按照默认顺序排序
 	void sort() {
 		std::sort(_vector, _vector + _size);
 	}
+	// 去重，要求有序
 	void unique() {
 		int pnt = 0;
 		for (int i = 0; i < _size; i++)

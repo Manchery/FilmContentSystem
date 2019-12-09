@@ -2,7 +2,6 @@
 #include "Vector.hpp"
 #include <algorithm>
 
-// TODO: unit test
 template<typename key_t, typename data_t>
 class SplayTree
 {

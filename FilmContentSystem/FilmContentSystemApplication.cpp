@@ -169,11 +169,11 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 {
 	using std::pair;
 	struct data_t {
-		int cnt, tot; // 不同词数、总次数
-		int clk; // 时间戳
+		int cnt, tot;	// 关键词个数、关键词总次数
+		int clk;		// 时间戳
 	};
 	int clk = 0;
-	SplayTree<int, data_t> Map;	// first：电影 id
+	SplayTree<int, data_t> Map;	// key_t：电影 id
 	for (auto it = keywords.begin(); it != keywords.end(); ++it) {
 		++clk;
 		CharString word = *it;
@@ -188,6 +188,7 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 	Vector<pair<int, data_t>> nodes = Map.list();
 	typedef bool(*cmpFunc)(const pair<int, data_t>&, const pair<int, data_t>&);
 	nodes.sort(cmpFunc{ [](const pair<int, data_t>& a, const pair<int, data_t> &b) {
+		// 依据关键词个数为第一关键字，总出现次数为第二关键字排序
 		data_t aD = a.second ,bD = b.second;
 		return aD.cnt == bD.cnt ? aD.tot > bD.tot: aD.cnt > bD.cnt;
 	} });
@@ -219,6 +220,7 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 			if (filmInfos[p.id()].name() == filmInfos[docId].name()) continue;
 			FilmInfo target = filmInfos[p.id()];
 
+			// 推荐依据 score = 评分/2 + 类型IoU*5 + 导演交集size + top5主演交集size + 标签交集size + 地区交集size
 			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
 				+ intersectionSize(target.directors(), info.directors())
 				+ intersectionSize(target.stars(), info.stars(), 5)

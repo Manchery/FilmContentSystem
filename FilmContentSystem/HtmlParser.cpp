@@ -237,10 +237,10 @@ void HtmlParser::postProcessTag(const HtmlTag & tag, FilmInfo & info)
 	}
 	else if (tag.type() == L"a" && tag.hasAttribute(L"href") 
 		&& tag.attributeValue(L"href").length()>5 && tag.attributeValue(L"href").substring(0, 5) == L"/tag/") {
-		info.addTag(tag.content()); // TODO: unit test
+		info.addTag(tag.content());
 	}
 	else if (tag.type() == L"strong" && tag.hasAttribute(L"class", L"ll rating_num")) {
-		info.setRating(tag.content().toDouble()); // TODO: unit test
+		info.setRating(tag.content().toDouble());
 	}
 }
 

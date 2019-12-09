@@ -5,7 +5,7 @@
 struct TermInfo {
 	CharString term;
 	int termId, DF, occur; // DF: 出现的文档数; occur: 出现总次数
-	DocumentList list; // TODO: memory leaks ?
+	DocumentList list;
 	TermInfo():term(), termId(-1), DF(0), occur(0), list() {}
 	bool empty() const { return list.empty(); }
 };
