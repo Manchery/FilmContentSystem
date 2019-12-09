@@ -103,7 +103,7 @@ void FilmContentSystemApplication::loadDatabase()
 			if (!endsWith(file.name, ".html"))
 				continue;
 
-			// std::cerr << "Found file " << file.name << "..." << std::endl;
+			//std::cerr << "Found file " << file.name << "..." << std::endl;
 
 			char baseName[MAX_FILE_NAME_LEN] = { 0 };
 			strncpy_s(baseName, file.name, strlen(file.name) - 5);
@@ -165,15 +165,15 @@ void FilmContentSystemApplication::buildIndex()
 	}
 }
 
-Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords)
+Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrieve(const CharStringLink & keywords) const
 {
 	using std::pair;
 	struct data_t {
-		int cnt, tot; // 不同词数、总次数
-		int clk; // 时间戳
+		int cnt, tot;	// 关键词个数、关键词总次数
+		int clk;		// 时间戳
 	};
 	int clk = 0;
-	SplayTree<int, data_t> Map;	// first：电影 id
+	SplayTree<int, data_t> Map;	// key_t：电影 id
 	for (auto it = keywords.begin(); it != keywords.end(); ++it) {
 		++clk;
 		CharString word = *it;
@@ -188,6 +188,7 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 	Vector<pair<int, data_t>> nodes = Map.list();
 	typedef bool(*cmpFunc)(const pair<int, data_t>&, const pair<int, data_t>&);
 	nodes.sort(cmpFunc{ [](const pair<int, data_t>& a, const pair<int, data_t> &b) {
+		// 依据关键词个数为第一关键字，总出现次数为第二关键字排序
 		data_t aD = a.second ,bD = b.second;
 		return aD.cnt == bD.cnt ? aD.tot > bD.tot: aD.cnt > bD.cnt;
 	} });
@@ -197,7 +198,7 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 	return res;
 }
 
-Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId, int topK)
+Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int docId, int topK) const
 {
 	FilmInfo info = filmInfos[docId];
 	struct data_t {
@@ -210,15 +211,16 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 		}
 	};
 	Vector<data_t> nodes;
-	int cap = topK * 1.5;
+	int cap = static_cast<int>(topK * 1.5);
 	for (auto it = info.genres().begin(); it != info.genres().end(); ++it) {
 		CharString genre = *it;
 		TermInfo term = genreIndex.search(genre);
 		int cnt = 0;
 		for (auto p = term.list.begin(); cnt < cap && p != term.list.end(); ++p, ++cnt) {
-			if (p.id() == docId) continue;
+			if (filmInfos[p.id()].name() == filmInfos[docId].name()) continue;
 			FilmInfo target = filmInfos[p.id()];
 
+			// 推荐依据 score = 评分/2 + 类型IoU*5 + 导演交集size + top5主演交集size + 标签交集size + 地区交集size
 			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
 				+ intersectionSize(target.directors(), info.directors())
 				+ intersectionSize(target.stars(), info.stars(), 5)
@@ -279,6 +281,7 @@ void FilmContentSystemApplication::doRetrieve()
 		wfout << std::endl;
 	}
 	wfin.close(); wfout.close();
+	std::cerr << "Batch retrievals done !" << std::endl;
 }
 
 void FilmContentSystemApplication::doRecommend()
@@ -309,17 +312,25 @@ void FilmContentSystemApplication::doRecommend()
 	}
 
 	wfin.close(); wfout.close();
+	std::cerr << "Batch recommending done !" << std::endl;
 }
 
-void FilmContentSystemApplication::run(const char * configFile)
+bool FilmContentSystemApplication::init(const char * configFile)
 {
 	loadConfig(configFile != nullptr ? configFile : DEFAULT_CONFIG_PATH);
 	if (!initDictionary(dictFile, hmmFile, stopwordsFile)) {
 		std::cerr << "Load dictionary failed !" << std::endl;
-		return;
+		return false;
 	}
 	loadDatabase();
 	buildIndex();
+	return true;
+}
+
+void FilmContentSystemApplication::run(const char * configFile)
+{
+	std::cerr << "Starting..." << std::endl;
+	if (!init(configFile)) return;
 	doRetrieve();
 	doRecommend();
 }
@@ -341,6 +352,12 @@ FilmInfo FilmContentSystemApplication::extractInfo(const char * htmlFile)
 CharStringLink FilmContentSystemApplication::divideWords(const CharString & passage, bool useHMM, bool useStopwords)
 {
 	return segmentor.cut(passage, useHMM, useStopwords);
+}
+
+std::wstring FilmContentSystemApplication::getInputDir() const {
+	wchar_t tmp[MAX_FLAG_LEN];
+	MultiByteToWideChar(CP_ACP, 0, inputDir, -1, tmp, MAX_FLAG_LEN);
+	return std::wstring(tmp);
 }
 
 
@@ -389,10 +406,10 @@ void readFilmInfo(const char *file, FilmInfo & info)
 			wfin >> info._rating;
 		}
 		else if (buf == L"剧情简介:") {
-			wchar_t line[1000];
-			wfin.getline(line, 1000);
+			const int MAXLEN = 5000; wchar_t line[MAXLEN];
+			wfin.getline(line, MAXLEN);
 			while (!wfin.eof()) {
-				wfin.getline(line, 1000);
+				wfin.getline(line, MAXLEN);
 				if (wcslen(line) == 0) continue;
 				if (!info._introduction.empty()) info._introduction += L"\n";
 				info._introduction += line;
@@ -423,3 +440,4 @@ void readFilmWord(const char *file, CharStringLink & cuts)
 	}
 	wfin.close();
 }
+

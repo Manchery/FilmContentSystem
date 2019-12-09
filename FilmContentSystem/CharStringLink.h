@@ -69,6 +69,9 @@ public:
 	CharString& front() { return head->str; }
 	CharString& back() { return tail->str; }
 
+	// 转化为 CharString，元素间用 " / " 分隔
+	CharString toCharString() const;
+
 	friend std::wostream & operator<<(std::wostream & os, const CharStringLink & str);
 };
 

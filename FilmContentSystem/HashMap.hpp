@@ -29,7 +29,7 @@ HashMap
 */
 
 // key_t, value_t: 键值类型; hashFunc: 哈希函数
-template<typename key_t, typename value_t, hash_t hashFunc(const key_t&) = charStringHash>
+template<typename key_t, typename value_t, hash_t hashFunc(const key_t&)>
 class HashMap
 {
 private:
@@ -111,12 +111,20 @@ public:
 		_size++;
 	}
 	// 检查key是否在表中存在
-	bool find(const key_t &key) {
+	bool find(const key_t &key) const {
 		unsigned h = hashFunc(key) % hashSize;
 		for (List* p = head[h]; p; p = p->next)
 			if (p->key == key)
 				return true;
 		return false;
+	}
+	// 索引key，若不存在，则返回空值
+	value_t at(const key_t &key) const {
+		unsigned h = hashFunc(key) % hashSize;
+		for (List* p = head[h]; p; p = p->next)
+			if (p->key == key)
+				return p->value;
+		return value_t();
 	}
 	// 索引key，若key在表中不存在，则创建一节点
 	value_t& operator [](const key_t &key) {
