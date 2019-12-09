@@ -17,7 +17,7 @@ void _main() {
 	FilmContentSystemApplication().run();
 #endif
 
-	std::cerr << std::endl << "Totally times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
+	std::cerr << "Totally times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 }
 
 void _debug(const char *dictFile, const char *hmmFile, const char* stopwordsFile, const char *inputFile, const char *infoFile, const char *txtFile) {

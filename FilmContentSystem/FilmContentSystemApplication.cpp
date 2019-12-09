@@ -281,6 +281,7 @@ void FilmContentSystemApplication::doRetrieve()
 		wfout << std::endl;
 	}
 	wfin.close(); wfout.close();
+	std::cerr << "Batch retrievals done !" << std::endl;
 }
 
 void FilmContentSystemApplication::doRecommend()
@@ -311,6 +312,7 @@ void FilmContentSystemApplication::doRecommend()
 	}
 
 	wfin.close(); wfout.close();
+	std::cerr << "Batch recommending done !" << std::endl;
 }
 
 bool FilmContentSystemApplication::init(const char * configFile)
@@ -327,6 +329,7 @@ bool FilmContentSystemApplication::init(const char * configFile)
 
 void FilmContentSystemApplication::run(const char * configFile)
 {
+	std::cerr << "Starting..." << std::endl;
 	if (!init(configFile)) return;
 	doRetrieve();
 	doRecommend();
