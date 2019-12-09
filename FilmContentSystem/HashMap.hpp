@@ -118,6 +118,7 @@ public:
 				return true;
 		return false;
 	}
+	// 索引key，若不存在，则返回空值
 	value_t at(const key_t &key) const {
 		unsigned h = hashFunc(key) % hashSize;
 		for (List* p = head[h]; p; p = p->next)
