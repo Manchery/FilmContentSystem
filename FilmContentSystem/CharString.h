@@ -78,5 +78,10 @@ bool operator==(const CharString &a, const CharString &b);
 bool operator<(const CharString &a, const CharString &b);
 
 // hashº¯Êý
-hash_t charStringHash(const CharString& str);
+extern hash_t charStringHash(const CharString& str);
 
+template<>
+class HashFunc<CharString> {
+public:
+	hash_t operator ()(const CharString& key) const { return charStringHash(key); }
+};

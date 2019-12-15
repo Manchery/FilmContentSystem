@@ -67,7 +67,7 @@ private:
 	// 分词、类型对应的倒排文档，分别用于检索和推荐
 	InvertedIndex<SplayTree> wordIndex, genreIndex;
 	// 将电影名映射到电影id
-	HashMap<CharString, int, charStringHash> filmIdMap;
+	HashMap<CharString, int> filmIdMap;
 public:
 	FilmContentSystemApplication();
 	~FilmContentSystemApplication();

@@ -19,6 +19,12 @@ const unsigned HASH_SIZES[] = {		// 大于2的次幂的最小质数，用作Hash表的模数
 	16777259, 33554467, 67108879
 }; 
 
+template<typename key_t>
+class HashFunc {
+public:
+	hash_t operator ()(const key_t&) const { return hash_t(); }
+};
+
 /*
 HashMap
 说明：	模板类，实现了哈希表的基本功能
@@ -29,7 +35,7 @@ HashMap
 */
 
 // key_t, value_t: 键值类型; hashFunc: 哈希函数
-template<typename key_t, typename value_t, hash_t hashFunc(const key_t&)>
+template<typename key_t, typename value_t>
 class HashMap
 {
 private:
@@ -40,6 +46,7 @@ private:
 	};
 	unsigned hashSize;	// 质数，作为Hash表的模数，也就是Hash表表头数组head的大小
 	List **head;		// 表头
+	HashFunc<key_t> hashFunc;	// hash函数
 
 	// 链表析构
 	void destructList(List *node) {
@@ -142,4 +149,3 @@ public:
 		return node->value;
 	}
 };
-

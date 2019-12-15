@@ -24,7 +24,7 @@ WordSegmentor
 class WordSegmentor
 {
 	// 词典和停用词典，dict中的value存储词频，stopwords中的value无意义（实际上是 HashSet）
-	HashMap < CharString, int, charStringHash > dict, stopwords;
+	HashMap<CharString, int> dict, stopwords;
 	
 	// 记录每个字作为量词结尾的出现次数，用于判断某一词是否为量词
 	int *numeralFreq;
