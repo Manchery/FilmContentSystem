@@ -65,6 +65,7 @@ private:
 	// 剧情简介分词结果
 	Vector<CharStringLink> filmWords;
 	// 分词、类型对应的倒排文档，分别用于检索和推荐
+	// 模板参数 index_t 可选为 SplayTree 或 HashMap
 	InvertedIndex<SplayTree> wordIndex, genreIndex;
 	// 将电影名映射到电影id
 	HashMap<CharString, int> filmIdMap;

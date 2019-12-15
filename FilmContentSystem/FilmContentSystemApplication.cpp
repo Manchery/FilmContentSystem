@@ -253,6 +253,7 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 
 void FilmContentSystemApplication::doRetrieve()
 {
+	auto start = clock();
 	std::wifstream wfin(retrieInput);
 	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 	std::wofstream wfout(retrieOutput);
@@ -281,11 +282,12 @@ void FilmContentSystemApplication::doRetrieve()
 		wfout << std::endl;
 	}
 	wfin.close(); wfout.close();
-	std::cerr << "Batch retrievals done !" << std::endl;
+	std::cerr << "Batch retrievals done ! Times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 }
 
 void FilmContentSystemApplication::doRecommend()
 {
+	auto start = clock();
 	std::wifstream wfin(recommInput);
 	wfin.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 	std::wofstream wfout(recommOutput);
@@ -312,7 +314,7 @@ void FilmContentSystemApplication::doRecommend()
 	}
 
 	wfin.close(); wfout.close();
-	std::cerr << "Batch recommending done !" << std::endl;
+	std::cerr << "Batch recommending done ! Times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 }
 
 bool FilmContentSystemApplication::init(const char * configFile)
@@ -323,7 +325,9 @@ bool FilmContentSystemApplication::init(const char * configFile)
 		return false;
 	}
 	loadDatabase();
+	auto start = clock();
 	buildIndex();
+	std::cerr << "Building Index times " << ((double)clock() - start) / CLOCKS_PER_SEC << std::endl;
 	return true;
 }
 
