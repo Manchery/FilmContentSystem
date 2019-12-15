@@ -177,7 +177,7 @@ Vector<std::pair<int, std::pair<int, int>>> FilmContentSystemApplication::retrie
 	for (auto it = keywords.begin(); it != keywords.end(); ++it) {
 		++clk;
 		CharString word = *it;
-		TermInfo term = wordIndex.search(word);
+		const TermInfo& term = wordIndex.search(word);
 		for (auto p = term.list.begin(); p != term.list.end(); ++p) {
 			data_t &data = Map[p.id()];
 			if (data.clk != clk) data.clk = clk, data.cnt++;
@@ -214,20 +214,20 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 	int cap = static_cast<int>(topK * 1.5);
 	for (auto it = info.genres().begin(); it != info.genres().end(); ++it) {
 		CharString genre = *it;
-		TermInfo term = genreIndex.search(genre);
+		const TermInfo &term = genreIndex.search(genre);
 		int cnt = 0;
 		for (auto p = term.list.begin(); cnt < cap && p != term.list.end(); ++p, ++cnt) {
 			if (filmInfos[p.id()].name() == filmInfos[docId].name()) continue;
-			FilmInfo target = filmInfos[p.id()];
+			const FilmInfo &target = filmInfos[p.id()];
 
 			// 推荐依据 score = 评分/2 + 类型IoU*5 + 导演交集size + top5主演交集size + 标签交集size + 地区交集size
-			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
+			/*double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
 				+ intersectionSize(target.directors(), info.directors())
 				+ intersectionSize(target.stars(), info.stars(), 5)
 				+ intersectionSize(target.tags(), info.tags())
 				+ intersectionSize(target.regions(), info.regions());
 			
-			nodes.push_back(data_t{ score, p.id()});
+			nodes.push_back(data_t{ score, p.id()});*/
 		}
 	}
 	nodes.sort();
@@ -304,7 +304,7 @@ void FilmContentSystemApplication::doRecommend()
 			continue;
 		}
 		int docId = filmIdMap[line];
-		Vector<std::pair<int, CharString>> res = recommend(docId, 10);
+		Vector<std::pair<int, CharString>> res = recommend(docId, 5);
 
 		for (int i = 0; i < res.size(); i++) {
 			if (i) wfout << ' ';

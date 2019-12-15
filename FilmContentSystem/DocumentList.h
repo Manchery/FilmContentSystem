@@ -31,8 +31,8 @@ public:
 		iterator(node * n) :cur(n) {}
 		iterator& operator ++ () { cur = cur->next; return *this; }
 		iterator next() const { return iterator(cur->next); }
-		bool operator == (const iterator & b) { return cur == b.cur; }
-		bool operator != (const iterator & b) { return cur != b.cur; }
+		bool operator == (const iterator & b) const { return cur == b.cur; }
+		bool operator != (const iterator & b) const { return cur != b.cur; }
 		int id() const { return cur->id; }
 		double rating() const { return cur->rating; }
 	};

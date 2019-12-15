@@ -61,11 +61,8 @@ public:
 		term.list.add(docId, rating);
 	}
 	// 查找 word 对应的TermInfo
-	TermInfo search(const CharString &word) const {
-		if (index.find(word))
-			return index.at(word);
-		else
-			return TermInfo();
+	const TermInfo& search(const CharString &word) const {
+		return index.at(word);
 	}
 };
 

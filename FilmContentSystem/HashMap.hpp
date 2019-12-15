@@ -112,7 +112,7 @@ public:
 	}
 	// 插入一个键值对
 	void insert(const key_t &key, const value_t & value) {
-		if (hashSize == 0 || _size == hashSize) realloc(hashSize + 1);
+		if (hashSize == 0 || _size >= hashSize/2) realloc(hashSize + 1);	// 负载系数 0.5
 		unsigned h = hashFunc(key) % hashSize;
 		List* node = new List{ key, value, nullptr }; node->next = head[h]; head[h] = node;
 		_size++;
@@ -126,7 +126,7 @@ public:
 		return false;
 	}
 	// 索引key，若不存在，则返回空值
-	value_t at(const key_t &key) const {
+	const value_t& at(const key_t &key) const {
 		unsigned h = hashFunc(key) % hashSize;
 		for (List* p = head[h]; p; p = p->next)
 			if (p->key == key)
@@ -142,7 +142,7 @@ public:
 					return p->value;
 		}
 		// key不存在，创建新节点
-		if (hashSize == 0 || _size == hashSize) realloc(hashSize + 1);
+		if (hashSize == 0 || _size >= hashSize/2) realloc(hashSize + 1);	// 负载系数 0.5
 		unsigned h = hashFunc(key) % hashSize;
 		List* node = new List{ key, value_t(), nullptr }; node->next = head[h]; head[h] = node;
 		_size++;

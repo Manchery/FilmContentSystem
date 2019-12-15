@@ -63,7 +63,7 @@ public:
 		return result->data;
 	}
 	// 索引，若key不存在，返回空的data
-	data_t at(const key_t &key) const {
+	const data_t &at(const key_t &key) const {
 		node *result = findNode(key);
 		if (result == null) return data_t();
 		return result->data;
