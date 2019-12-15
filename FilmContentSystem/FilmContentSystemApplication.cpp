@@ -221,13 +221,13 @@ Vector<std::pair<int, CharString>> FilmContentSystemApplication::recommend(int d
 			const FilmInfo &target = filmInfos[p.id()];
 
 			// 推荐依据 score = 评分/2 + 类型IoU*5 + 导演交集size + top5主演交集size + 标签交集size + 地区交集size
-			/*double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
+			double score = target.rating()/2 + 5 * IoU(target.genres(), info.genres())
 				+ intersectionSize(target.directors(), info.directors())
 				+ intersectionSize(target.stars(), info.stars(), 5)
 				+ intersectionSize(target.tags(), info.tags())
 				+ intersectionSize(target.regions(), info.regions());
 			
-			nodes.push_back(data_t{ score, p.id()});*/
+			nodes.push_back(data_t{ score, p.id()});
 		}
 	}
 	nodes.sort();
