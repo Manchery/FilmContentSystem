@@ -262,3 +262,7 @@ __pycache__/
 
 # Qt
 build-FilmContentSystem_GUI-*
+
+# Project
+Part2/exe/input
+Part2/exe/gui.exe
