@@ -55,7 +55,7 @@
       </font>
      </property>
      <property name="text">
-      <string>电影信息检索</string>
+      <string>电影信息检索与推荐</string>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -65,6 +65,16 @@
      </property>
      <property name="margin">
       <number>12</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>请输入电影名或检索关键词</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
