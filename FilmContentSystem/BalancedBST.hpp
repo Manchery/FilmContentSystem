@@ -24,9 +24,11 @@ public:
 		void setChild(node *x, int d) { ch[d] = x; x->p = this; }
 		void update() { size = ch[0]->size + ch[1]->size + 1; }
 	}*null;
+	data_t emptyData;
 
 	SplayTree() {
 		root = null = new node; null->ch[0] = null->ch[1] = null->p = null; null->size = 0;
+		emptyData = data_t();
 	}
 	~SplayTree() {
 		destructTree(root);
@@ -65,7 +67,7 @@ public:
 	// 索引，若key不存在，返回空的data
 	const data_t &at(const key_t &key) const {
 		node *result = findNode(key);
-		if (result == null) return data_t();
+		if (result == null) return emptyData;
 		return result->data;
 	}
 	// 查找 key 是否存在
