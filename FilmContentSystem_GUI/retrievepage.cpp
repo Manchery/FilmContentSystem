@@ -69,7 +69,12 @@ QWidget *RetrievePage::retrieResultItem(std::pair<int, std::pair<int, int> > res
     auto childItem = new QWidget(item);
 
     auto nameLabel = new ClickableLabel(childItem);
-    nameLabel->setText("<font color=\"#1a0dab\"><big><u>"+CharString2QString(app->getInfo(id).name())+"</u></big></font>");
+    QString nameStr = "<big><u><font color=\"#1a0dab\">"+CharString2QString(app->getInfo(id).name())+"</font></u></big>";
+    for (auto p=keywords.begin();p!=keywords.end();++p){
+        QString word = CharString2QString(*p);
+        nameStr.replace(word, "</font><font color=\"#dd4b39\">"+word+"</font><font color=\"#1a0dab\">");
+    }
+    nameLabel->setText(nameStr);
     auto cntLabel = new QLabel(childItem);
     cntLabel->setAlignment(Qt::AlignRight);
     cntLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -131,6 +136,8 @@ QString RetrievePage::abstract(const QString &text, const CharStringLink &keywor
         QString word = CharString2QString(*p);
         abs.replace(word, "<font color=\"#dd4b39\">"+word+"</font>");
     }
+    if (abs == "...")
+        abs = text.mid(0,60) + "...";
     return abs;
 }
 

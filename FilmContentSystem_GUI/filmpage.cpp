@@ -89,6 +89,7 @@ void FilmPage::setHighlight(const CharStringLink &keywords)
     for (auto p=keywords.begin();p!=keywords.end();++p){
         QString word = CharString2QString(*p);
         text.replace(word, "<span style=\"background-color: #FFFF00\">"+word+"</span>");
+        // text.replace(word, "<font color=\"#dd4b39\">"+word+"</font>");
     }
     ui->infoLabel->setText(text);
 }

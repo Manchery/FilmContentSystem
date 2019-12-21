@@ -132,8 +132,9 @@ void FilmContentSystemApplication::loadDatabase()
 				wfout.close();
 				filmInfos[docId] = info;
 
-				// 中文分词
-				CharStringLink cuts = divideWords(info.introduction(), useHMM, useStopwords);
+				// 中文分词：电影名和简介
+				CharStringLink cuts = divideWords(info.name(), useHMM, useStopwords);
+				cuts.concat(divideWords(info.introduction(), useHMM, useStopwords));
 				wfout.open(txtFile);
 				wfout.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 				for (auto it = cuts.begin(); it != cuts.end(); ++it)
