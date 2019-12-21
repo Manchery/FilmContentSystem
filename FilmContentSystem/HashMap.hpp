@@ -47,6 +47,7 @@ private:
 	unsigned hashSize;	// 质数，作为Hash表的模数，也就是Hash表表头数组head的大小
 	List **head;		// 表头
 	HashFunc<key_t> hashFunc;	// hash函数
+	value_t emptyValue;
 
 	// 链表析构
 	void destructList(List *node) {
@@ -86,6 +87,7 @@ public:
 	HashMap() {
 		hashSize = 0; head = nullptr;
 		_size = 0; 
+		emptyValue = value_t();
 	}
 	~HashMap() {
 		if (head != nullptr) {
@@ -131,7 +133,7 @@ public:
 		for (List* p = head[h]; p; p = p->next)
 			if (p->key == key)
 				return p->value;
-		return value_t();
+		return emptyValue;
 	}
 	// 索引key，若key在表中不存在，则创建一节点
 	value_t& operator [](const key_t &key) {
