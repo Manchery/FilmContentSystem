@@ -305,9 +305,11 @@ void FilmContentSystemApplication::doRecommend()
 			continue;
 		}
 		int docId = filmIdMap[line];
-		Vector<std::pair<int, CharString>> res = recommend(docId, 5);
+		// 参数 topK 设为10，是为了找到更多的相关电影
+		Vector<std::pair<int, CharString>> res = recommend(docId, 10);
 
-		for (int i = 0; i < res.size(); i++) {
+		// 推荐 5 个
+		for (int i = 0; i < 5; i++) {
 			if (i) wfout << ' ';
 			wfout << '(' << res[i].first << ',' << res[i].second << ")";
 		}
