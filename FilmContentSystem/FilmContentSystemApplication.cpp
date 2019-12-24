@@ -310,7 +310,7 @@ void FilmContentSystemApplication::doRecommend()
 
 		// ÍÆ¼ö 5 ¸ö
 		for (int i = 0; i < 5; i++) {
-			if (i) wfout << ' ';
+			if (i) wfout << ',';
 			wfout << '(' << res[i].first << ',' << res[i].second << ")";
 		}
 		wfout << std::endl;
