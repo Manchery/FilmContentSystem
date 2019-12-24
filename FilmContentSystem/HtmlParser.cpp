@@ -178,8 +178,11 @@ CharString HtmlParser::postProcessSummary(const CharString & summary)
 			i = j; continue;
 		}
 		if (i + 3 < len && summary.substring(i, i + 4) == L"<br>") {
-			res += '\n', i += 4;
+			res += '\n', i += 3;
 			while (i + 1 < len && iswspace(summary[i + 1])) i++;
+		}
+		else if (i + 5 < len && summary.substring(i, i + 6) == L"&quot;") {
+			res += '\"'; i += 5;
 		}
 		else 
 			res += summary[i];
